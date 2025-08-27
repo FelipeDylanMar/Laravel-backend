@@ -2,34 +2,35 @@
 
 ## 📋 Sobre o Projeto
 
-Este é um projeto Laravel 11 desenvolvido como parte do INNYX Challenge. O projeto foi criado e configurado para funcionar mesmo em ambientes com extensões PHP limitadas, incluindo soluções para problemas comuns de configuração.
+Este é um sistema completo de gerenciamento de produtos desenvolvido em Laravel 11 como parte do INNYX Challenge. O sistema inclui autenticação por token, CRUD completo de produtos, categorias e upload de imagens, totalmente funcional com banco de dados SQLite.
 
 ## ✨ Características
 
 - **Laravel 11** - Framework PHP moderno
-- **API RESTful** - Endpoints funcionais para testes
-- **Compatibilidade** - Funciona sem extensões `mbstring`, `sqlite`, `curl`
-- **Configuração Flexível** - Drivers alternativos para sessão, cache e queue
-- **Testes Incluídos** - Scripts de teste em PHP e PowerShell
+- **Sistema de Produtos** - CRUD completo com validações
+- **Autenticação Sanctum** - Proteção por token Bearer
+- **Upload de Imagens** - Sistema completo de upload
+- **Banco SQLite** - Configurado e funcionando
+- **API RESTful** - Endpoints completos para produtos e categorias
+- **Relacionamentos** - Produtos vinculados a categorias
+- **Paginação e Busca** - Sistema avançado de listagem
 
-## 🔧 Correções Implementadas
+## 🗄️ Banco de Dados
 
-### 1. Problema: Driver SQLite não encontrado
-**Solução:**
-- Configuração de driver `null` para banco de dados
-- Drivers alternativos (`file`, `sync`) para sessão, cache e queue
-- Desabilitação temporária da conexão SQLite
+### Configuração Atual
+- **Tipo:** SQLite
+- **Localização:** `database/database.sqlite`
+- **Status:** ✅ Configurado e funcionando
 
-### 2. Problema: Extensão mbstring ausente
-**Solução:**
-- Implementação de funções `mb_*` alternativas
-- Carregamento automático no bootstrap da aplicação
-- Compatibilidade total sem a extensão nativa
+### Tabelas Criadas
+- **categories** - Categorias de produtos
+- **products** - Produtos com relacionamento
+- **users** - Usuários do sistema
+- **personal_access_tokens** - Tokens de autenticação Sanctum
 
-### 3. Problema: Rotas de API não carregadas
-**Solução:**
-- Configuração adequada do roteamento no `bootstrap/app.php`
-- Rotas de API totalmente funcionais
+### Dados de Exemplo
+- 3 categorias pré-cadastradas
+- 1 usuário de teste para autenticação
 
 ## 🚀 Como Usar
 
@@ -66,35 +67,49 @@ Este é um projeto Laravel 11 desenvolvido como parte do INNYX Challenge. O proj
 **Endpoints disponíveis:**
 
 ```bash
-# Teste básico
-GET http://127.0.0.1:8000/api/teste
+# Listar categorias (público)
+GET http://127.0.0.1:8000/api/categories
 
-# Status do sistema
-GET http://127.0.0.1:8000/api/status
+# Listar produtos (requer autenticação)
+GET http://127.0.0.1:8000/api/products
+Headers: Authorization: Bearer {token}
 
-# Lista de usuários (simulados)
-GET http://127.0.0.1:8000/api/usuarios
+# Criar produto (requer autenticação)
+POST http://127.0.0.1:8000/api/products
+Headers: Authorization: Bearer {token}
 
-# Informações da requisição
-GET http://127.0.0.1:8000/api/request-info
+# Ver produto específico
+GET http://127.0.0.1:8000/api/products/{id}
+
+# Atualizar produto
+PUT http://127.0.0.1:8000/api/products/{id}
+
+# Deletar produto
+DELETE http://127.0.0.1:8000/api/products/{id}
 ```
 
-**Usando PowerShell:**
-```powershell
-# Teste básico
-Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/teste" -Method GET
+**Credenciais de teste:**
+- Email: `teste@exemplo.com`
+- Senha: `123456`
 
-# Status do sistema
-Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/status" -Method GET
-```
+**Como obter token de autenticação:**
 
-**Usando cURL:**
+Para testar os endpoints protegidos, você pode gerar um token manualmente:
+
 ```bash
-# Teste básico
-curl http://127.0.0.1:8000/api/teste
+# Execute no terminal do projeto:
+php artisan tinker
 
-# Status do sistema
-curl http://127.0.0.1:8000/api/status
+# No tinker, execute:
+$user = App\Models\User::where('email', 'teste@exemplo.com')->first();
+$token = $user->createToken('test-token')->plainTextToken;
+echo $token;
+```
+
+**Usando o token:**
+```bash
+GET http://127.0.0.1:8000/api/products
+Authorization: Bearer {token_gerado_acima}
 ```
 
 ## 📁 Estrutura do Projeto
@@ -128,28 +143,38 @@ meu-projeto-laravel/
 
 ✅ **Funcionando:**
 - Servidor Laravel na porta 8000
-- Todas as rotas de API
-- Funções mb_* implementadas
-- Configuração sem SQLite
+- Sistema completo de produtos e categorias
+- Autenticação Laravel Sanctum
+- Banco de dados SQLite com migrations
+- Upload de imagens
+- Validações completas
+- Relacionamentos entre tabelas
+- Paginação e busca
+- 3 categorias pré-cadastradas
+- Usuário de teste criado
 
-⚠️ **Limitações:**
-- Extensões PHP ausentes: `mbstring`, `sqlite3`, `curl`
-- Testes unitários requerem extensões adicionais
-- Rotas POST podem ter problemas com CSRF
+✅ **Extensões PHP Habilitadas:**
+- `pdo_sqlite` - Banco de dados
+- `mbstring` - Manipulação de strings
+- `json` - Processamento JSON
+- `openssl` - Criptografia
+- `fileinfo` - Upload de arquivos
 
 ## 🛠️ Próximos Passos
 
 ### Para Produção:
-1. Instalar extensões PHP necessárias
-2. Configurar banco de dados real (MySQL/PostgreSQL)
-3. Implementar autenticação e autorização
-4. Configurar cache Redis/Memcached
+1. Migrar para MySQL/PostgreSQL
+2. Configurar storage em nuvem para imagens
+3. Implementar cache Redis/Memcached
+4. Adicionar rate limiting
+5. Configurar HTTPS
 
 ### Para Desenvolvimento:
-1. Configurar ambiente com todas as extensões
-2. Implementar testes unitários completos
-3. Adicionar middleware de CORS
-4. Configurar CI/CD
+1. Implementar testes unitários completos
+2. Adicionar middleware de CORS
+3. Configurar CI/CD
+4. Documentação OpenAPI/Swagger
+5. Sistema de logs avançado
 
 ## 📝 Logs e Debugging
 

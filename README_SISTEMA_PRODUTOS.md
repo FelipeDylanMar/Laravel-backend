@@ -18,6 +18,21 @@ Sistema backend desenvolvido em Laravel para gerenciamento de produtos com auten
 - **MySQL/SQLite** - Banco de dados
 - **PHP 8.2+** - Linguagem de programação
 
+## Requisitos do Sistema
+
+### Requisitos Mínimos
+- **PHP:** 8.2 ou superior
+- **Composer:** 2.0 ou superior
+- **Memória:** 512MB RAM
+- **Espaço em disco:** 100MB livres
+
+### Extensões PHP Necessárias
+- `pdo_sqlite` ou `pdo_mysql`
+- `mbstring`
+- `json`
+- `openssl`
+- `fileinfo` (para upload de imagens)
+
 ## Estrutura do Banco de Dados
 
 ### Tabela Categories
@@ -50,6 +65,8 @@ Sistema backend desenvolvido em Laravel para gerenciamento de produtos com auten
    git clone <url-do-repositorio>
    cd meu-projeto-laravel
    ```
+
+   > **Nota:** Certifique-se de que todas as extensões PHP necessárias estão habilitadas antes de prosseguir.
 
 2. **Instale as dependências**
    ```bash
