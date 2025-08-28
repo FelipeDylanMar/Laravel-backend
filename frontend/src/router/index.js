@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // Lazy loading das views
 const Home = () => import('../views/HomeView.vue')
+const Login = () => import('../views/LoginView.vue')
+const Products = () => import('../views/ProductsView.vue')
+const ProductForm = () => import('../views/ProductFormView.vue')
+const ProductDetail = () => import('../views/ProductDetailView.vue')
 
 const routes = [
   {
@@ -9,6 +13,36 @@ const routes = [
     name: 'Home',
     component: Home,
     meta: { requiresAuth: false }
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/products',
+    name: 'Products',
+    component: Products,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/products/new',
+    name: 'ProductCreate',
+    component: ProductForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/products/:id/edit',
+    name: 'ProductEdit',
+    component: ProductForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/products/:id',
+    name: 'ProductDetail',
+    component: ProductDetail,
+    meta: { requiresAuth: true }
   },
   {
     path: '/:pathMatch(.*)*',
