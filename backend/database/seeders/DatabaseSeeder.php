@@ -36,5 +36,8 @@ class DatabaseSeeder extends Seeder
         Category::create(['nome' => 'Esportes']);
         Category::create(['nome' => 'Brinquedos']);
         Category::create(['nome' => 'Outros']);
+        
+        // Executar seeder de produtos
+        $this->call(ProductSeeder::class);
     }
 }

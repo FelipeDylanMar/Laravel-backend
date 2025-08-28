@@ -30,7 +30,7 @@
                 <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
               </svg>
               <span class="ml-4 text-sm font-medium text-gray-500 truncate">
-                {{ product?.name || 'Carregando...' }}
+                {{ product?.nome || 'Carregando...' }}
               </span>
             </div>
           </li>
@@ -103,23 +103,12 @@
           <!-- Product info -->
           <div class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
             <div class="flex items-center justify-between">
-              <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">{{ product.name }}</h1>
-              <div class="flex items-center space-x-2">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  :class="{
-                    'bg-green-100 text-green-800': product.is_active,
-                    'bg-red-100 text-red-800': !product.is_active
-                  }"
-                >
-                  {{ product.is_active ? 'Ativo' : 'Inativo' }}
-                </span>
-              </div>
+              <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">{{ product.nome }}</h1>
             </div>
 
             <div class="mt-3">
               <h2 class="sr-only">Informações do produto</h2>
-              <p class="text-3xl text-gray-900 font-bold">R$ {{ formatPrice(product.price) }}</p>
+              <p class="text-3xl text-gray-900 font-bold">R$ {{ formatPrice(product.preco) }}</p>
             </div>
 
             <!-- Category -->
@@ -132,21 +121,11 @@
               </div>
             </div>
 
-            <!-- Stock -->
+            <!-- Data de Validade -->
             <div class="mt-6">
-              <h3 class="text-sm font-medium text-gray-900">Estoque</h3>
-              <div class="mt-2 flex items-center">
-                <span class="text-lg font-medium text-gray-900">{{ product.stock_quantity }} unidades</span>
-                <span
-                  class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  :class="{
-                    'bg-green-100 text-green-800': product.stock_quantity > 10,
-                    'bg-yellow-100 text-yellow-800': product.stock_quantity > 0 && product.stock_quantity <= 10,
-                    'bg-red-100 text-red-800': product.stock_quantity === 0
-                  }"
-                >
-                  {{ getStockStatus(product.stock_quantity) }}
-                </span>
+              <h3 class="text-sm font-medium text-gray-900">Data de Validade</h3>
+              <div class="mt-2">
+                <span class="text-lg font-medium text-gray-900">{{ formatDate(product.data_validade) }}</span>
               </div>
             </div>
 
@@ -154,7 +133,7 @@
             <div class="mt-6">
               <h3 class="text-sm font-medium text-gray-900">Descrição</h3>
               <div class="mt-2 prose prose-sm text-gray-500">
-                <p>{{ product.description }}</p>
+                <p>{{ product.descricao }}</p>
               </div>
             </div>
 
@@ -238,11 +217,11 @@ const productImages = computed(() => {
   if (!product.value) return []
   
   // Se o produto tem imagem, usar ela, senão usar placeholder
-  if (product.value.image) {
+  if (product.value.imagem) {
     return [
       {
-        src: product.value.image,
-        alt: product.value.name
+        src: `/images/${product.value.imagem}`,
+        alt: product.value.nome
       }
     ]
   }
@@ -303,24 +282,13 @@ const formatDate = (dateString) => {
 }
 
 const getCategoryName = (category) => {
-  const categories = {
-    electronics: 'Eletrônicos',
-    clothing: 'Roupas',
-    books: 'Livros',
-    home: 'Casa e Jardim',
-    sports: 'Esportes',
-    toys: 'Brinquedos',
-    other: 'Outros'
+  if (category && category.nome) {
+    return category.nome
   }
-  
-  return categories[category] || category
+  return 'Categoria não definida'
 }
 
-const getStockStatus = (quantity) => {
-  if (quantity === 0) return 'Esgotado'
-  if (quantity <= 10) return 'Estoque Baixo'
-  return 'Em Estoque'
-}
+
 
 // Lifecycle
 onMounted(() => {

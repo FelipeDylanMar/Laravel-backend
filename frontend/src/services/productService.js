@@ -82,7 +82,7 @@ class ProductService {
   // Obter categorias de produtos
   async getCategories() {
     try {
-      const response = await apiService.get('/products/categories')
+      const response = await apiService.get('/categories')
       return response
     } catch (error) {
       throw new Error(error.message || 'Erro ao carregar categorias')

@@ -57,45 +57,45 @@
         <form @submit.prevent="handleSubmit" class="space-y-6 p-6">
           <!-- Name -->
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">
+            <label for="nome" class="block text-sm font-medium text-gray-700">
               Nome do Produto *
             </label>
             <div class="mt-1">
               <input
-                id="name"
-                v-model="form.name"
+                id="nome"
+                v-model="form.nome"
                 type="text"
                 required
                 class="input-field"
-                :class="{ 'border-red-300': errors.name }"
+                :class="{ 'border-red-300': errors.nome }"
                 placeholder="Digite o nome do produto"
               />
-              <p v-if="errors.name" class="mt-2 text-sm text-red-600">{{ errors.name }}</p>
+              <p v-if="errors.nome" class="mt-2 text-sm text-red-600">{{ errors.nome }}</p>
             </div>
           </div>
 
           <!-- Description -->
           <div>
-            <label for="description" class="block text-sm font-medium text-gray-700">
+            <label for="descricao" class="block text-sm font-medium text-gray-700">
               Descrição *
             </label>
             <div class="mt-1">
               <textarea
-                id="description"
-                v-model="form.description"
+                id="descricao"
+                v-model="form.descricao"
                 rows="4"
                 required
                 class="input-field"
-                :class="{ 'border-red-300': errors.description }"
+                :class="{ 'border-red-300': errors.descricao }"
                 placeholder="Digite a descrição do produto"
               ></textarea>
-              <p v-if="errors.description" class="mt-2 text-sm text-red-600">{{ errors.description }}</p>
+              <p v-if="errors.descricao" class="mt-2 text-sm text-red-600">{{ errors.descricao }}</p>
             </div>
           </div>
 
           <!-- Price -->
           <div>
-            <label for="price" class="block text-sm font-medium text-gray-700">
+            <label for="preco" class="block text-sm font-medium text-gray-700">
               Preço *
             </label>
             <div class="mt-1 relative rounded-md shadow-sm">
@@ -103,57 +103,57 @@
                 <span class="text-gray-500 sm:text-sm">R$</span>
               </div>
               <input
-                id="price"
-                v-model="form.price"
+                id="preco"
+                v-model="form.preco"
                 type="number"
                 step="0.01"
                 min="0"
                 required
                 class="input-field pl-12 pr-12"
-                :class="{ 'border-red-300': errors.price }"
+                :class="{ 'border-red-300': errors.preco }"
                 placeholder="0,00"
               />
-              <p v-if="errors.price" class="mt-2 text-sm text-red-600">{{ errors.price }}</p>
+              <p v-if="errors.preco" class="mt-2 text-sm text-red-600">{{ errors.preco }}</p>
             </div>
           </div>
 
           <!-- Category -->
           <div>
-            <label for="category" class="block text-sm font-medium text-gray-700">
-              Categoria
+            <label for="categoria_id" class="block text-sm font-medium text-gray-700">
+              Categoria *
             </label>
             <div class="mt-1">
               <select
-                id="category"
-                v-model="form.category"
+                id="categoria_id"
+                v-model="form.categoria_id"
+                required
                 class="input-field"
-                :class="{ 'border-red-300': errors.category }"
+                :class="{ 'border-red-300': errors.categoria_id }"
               >
                 <option value="">Selecione uma categoria</option>
                 <option v-for="category in categories" :key="category.id" :value="category.id">
                   {{ category.nome }}
                 </option>
               </select>
-              <p v-if="errors.category" class="mt-2 text-sm text-red-600">{{ errors.category }}</p>
+              <p v-if="errors.categoria_id" class="mt-2 text-sm text-red-600">{{ errors.categoria_id }}</p>
             </div>
           </div>
 
-          <!-- Stock Quantity -->
+          <!-- Data de Validade -->
           <div>
-            <label for="stock_quantity" class="block text-sm font-medium text-gray-700">
-              Quantidade em Estoque
+            <label for="data_validade" class="block text-sm font-medium text-gray-700">
+              Data de Validade *
             </label>
             <div class="mt-1">
               <input
-                id="stock_quantity"
-                v-model="form.stock_quantity"
-                type="number"
-                min="0"
+                id="data_validade"
+                v-model="form.data_validade"
+                type="date"
+                required
                 class="input-field"
-                :class="{ 'border-red-300': errors.stock_quantity }"
-                placeholder="0"
+                :class="{ 'border-red-300': errors.data_validade }"
               />
-              <p v-if="errors.stock_quantity" class="mt-2 text-sm text-red-600">{{ errors.stock_quantity }}</p>
+              <p v-if="errors.data_validade" class="mt-2 text-sm text-red-600">{{ errors.data_validade }}</p>
             </div>
           </div>
 
@@ -199,23 +199,7 @@
             <p v-if="errors.image" class="mt-2 text-sm text-red-600">{{ errors.image }}</p>
           </div>
 
-          <!-- Status -->
-          <div>
-            <div class="flex items-center">
-              <input
-                id="is_active"
-                v-model="form.is_active"
-                type="checkbox"
-                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label for="is_active" class="ml-2 block text-sm text-gray-900">
-                Produto ativo
-              </label>
-            </div>
-            <p class="mt-1 text-sm text-gray-500">
-              Produtos inativos não aparecerão na listagem pública.
-            </p>
-          </div>
+
 
           <!-- Error Message -->
           <div v-if="submitError" class="rounded-md bg-red-50 p-4">
@@ -281,21 +265,20 @@ const imageInput = ref(null)
 const categories = ref([])
 
 const form = reactive({
-  name: '',
-  description: '',
-  price: '',
-  category: '',
-  stock_quantity: 0,
-  image: null,
-  is_active: true
+  nome: '',
+  descricao: '',
+  preco: '',
+  categoria_id: '',
+  data_validade: '',
+  image: null
 })
 
 const errors = reactive({
-  name: '',
-  description: '',
-  price: '',
-  category: '',
-  stock_quantity: '',
+  nome: '',
+  descricao: '',
+  preco: '',
+  categoria_id: '',
+  data_validade: '',
   image: ''
 })
 
@@ -334,13 +317,12 @@ const fetchProduct = async () => {
     
     if (productsStore.currentProduct) {
       Object.assign(form, {
-        name: productsStore.currentProduct.name || '',
-        description: productsStore.currentProduct.description || '',
-        price: productsStore.currentProduct.price || '',
-        category: productsStore.currentProduct.category || '',
-        stock_quantity: productsStore.currentProduct.stock_quantity || 0,
-        image: null, // Reset image field for editing
-        is_active: productsStore.currentProduct.is_active !== undefined ? productsStore.currentProduct.is_active : true
+        nome: productsStore.currentProduct.nome || '',
+        descricao: productsStore.currentProduct.descricao || '',
+        preco: productsStore.currentProduct.preco || '',
+        categoria_id: productsStore.currentProduct.categoria_id || '',
+        data_validade: productsStore.currentProduct.data_validade || '',
+        image: null // Reset image field for editing
       })
       
       // Set image preview if product has an image
@@ -363,23 +345,28 @@ const validateForm = () => {
   
   let isValid = true
   
-  if (!form.name.trim()) {
-    errors.name = 'Nome é obrigatório'
+  if (!form.nome.trim()) {
+    errors.nome = 'Nome é obrigatório'
     isValid = false
   }
   
-  if (!form.description.trim()) {
-    errors.description = 'Descrição é obrigatória'
+  if (!form.descricao.trim()) {
+    errors.descricao = 'Descrição é obrigatória'
     isValid = false
   }
   
-  if (!form.price || form.price <= 0) {
-    errors.price = 'Preço deve ser maior que zero'
+  if (!form.preco || form.preco <= 0) {
+    errors.preco = 'Preço deve ser maior que zero'
     isValid = false
   }
   
-  if (form.stock_quantity < 0) {
-    errors.stock_quantity = 'Quantidade não pode ser negativa'
+  if (!form.categoria_id) {
+    errors.categoria_id = 'Categoria é obrigatória'
+    isValid = false
+  }
+  
+  if (!form.data_validade) {
+    errors.data_validade = 'Data de validade é obrigatória'
     isValid = false
   }
   
@@ -394,11 +381,11 @@ const handleSubmit = async () => {
   
   try {
     const productData = {
-      nome: form.name,
-      descricao: form.description,
-      preco: parseFloat(form.price),
-      data_validade: '2025-12-31', // Data padrão futura
-      categoria_id: form.category ? parseInt(form.category) : 1 // ID da categoria
+      nome: form.nome,
+      descricao: form.descricao,
+      preco: parseFloat(form.preco),
+      data_validade: form.data_validade,
+      categoria_id: parseInt(form.categoria_id)
     }
     
     if (isEditing.value) {
@@ -471,6 +458,13 @@ onMounted(() => {
   // Clear any previous product data
   productsStore.clearCurrentProduct()
   productsStore.clearError()
+  
+  // Definir data padrão (1 ano a partir de hoje) se não estiver editando
+  if (!isEditing.value) {
+    const today = new Date()
+    const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())
+    form.data_validade = nextYear.toISOString().split('T')[0]
+  }
   
   // Carregar categorias e produto
   loadCategories()
