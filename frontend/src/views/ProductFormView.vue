@@ -250,7 +250,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
-import { productService } from '@/services/productService'
+import productService from '@/services/productService'
 
 const route = useRoute()
 const router = useRouter()
@@ -290,7 +290,7 @@ const productId = computed(() => route.params.id)
 const loadCategories = async () => {
   try {
     const response = await productService.getCategories()
-    categories.value = response.data
+    categories.value = response || []
   } catch (error) {
     console.error('Erro ao carregar categorias:', error)
     // Fallback para categorias padrão

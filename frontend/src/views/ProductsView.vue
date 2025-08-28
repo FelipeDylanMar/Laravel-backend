@@ -13,6 +13,7 @@
           <router-link
             to="/products/new"
             class="btn-primary text-sm"
+            @click="handleAddProduct"
           >
             Adicionar Produto
           </router-link>
@@ -233,9 +234,11 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const productsStore = useProductsStore()
+const authStore = useAuthStore()
 
 // State
 const searchQuery = ref('')
@@ -325,6 +328,15 @@ const formatPrice = (price) => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(price)
+}
+
+const handleAddProduct = () => {
+  console.log('Botão Adicionar Produto clicado')
+  console.log('Estado de autenticação:', authStore.isAuthenticated)
+  console.log('Token:', authStore.token)
+  console.log('Usuário:', authStore.user)
+  console.log('Tentando navegar para /products/new')
+  router.push('/products/new')
 }
 
 // Lifecycle
