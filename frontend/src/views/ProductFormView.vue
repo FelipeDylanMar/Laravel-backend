@@ -224,6 +224,13 @@
               Cancelar
             </router-link>
             <button
+              type="button"
+              @click="testPayload"
+              class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Teste Payload
+            </button>
+            <button
               type="submit"
               :disabled="submitting"
               class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
@@ -375,6 +382,50 @@ const validateForm = () => {
   return isValid
 }
 
+const testPayload = async () => {
+  console.log('=== TESTE DE PAYLOAD ===')
+  
+  // Criar um payload de teste padrão
+  const testFormData = new FormData()
+  testFormData.append('nome', 'Produto Teste')
+  testFormData.append('descricao', 'Esta é uma descrição de teste para o produto')
+  testFormData.append('preco', '29.99')
+  testFormData.append('categoria_id', '1')
+  testFormData.append('data_validade', '2024-12-31')
+  
+  console.log('FormData criado:')
+  for (let [key, value] of testFormData.entries()) {
+    console.log(`${key}: ${value}`)
+  }
+  
+  try {
+    console.log('Enviando para o backend...')
+    const response = await fetch('http://localhost:8000/api/products', {
+      method: 'POST',
+      body: testFormData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    
+    console.log('Status da resposta:', response.status)
+    console.log('Headers da resposta:', Object.fromEntries(response.headers.entries()))
+    
+    const responseData = await response.text()
+    console.log('Resposta do backend (texto):', responseData)
+    
+    try {
+      const jsonData = JSON.parse(responseData)
+      console.log('Resposta do backend (JSON):', jsonData)
+    } catch (e) {
+      console.log('Resposta não é JSON válido')
+    }
+    
+  } catch (error) {
+    console.error('Erro na requisição:', error)
+  }
+}
+
 const handleSubmit = async () => {
   if (!validateForm()) return
   
@@ -382,15 +433,16 @@ const handleSubmit = async () => {
   submitError.value = ''
   
   try {
-    const productData = {
-      nome: form.nome,
-      descricao: form.descricao,
-      preco: parseFloat(form.preco),
-      data_validade: form.data_validade,
-      categoria_id: parseInt(form.categoria_id)
-    }
-    
     if (isEditing.value) {
+      // Para edição, enviar dados JSON
+      const productData = {
+        nome: form.nome,
+        descricao: form.descricao,
+        preco: parseFloat(form.preco),
+        data_validade: form.data_validade,
+        categoria_id: parseInt(form.categoria_id)
+      }
+      
       await productsStore.updateProduct(productId.value, productData)
       
       // Upload image separately if provided
@@ -399,13 +451,20 @@ const handleSubmit = async () => {
         // await productsStore.uploadProductImage(productId.value, form.image)
       }
     } else {
-      const newProduct = await productsStore.createProduct(productData)
+      // Para criação, usar FormData para incluir a imagem
+      const formData = new FormData()
+      formData.append('nome', form.nome)
+      formData.append('descricao', form.descricao)
+      formData.append('preco', form.preco.toString())
+      formData.append('data_validade', form.data_validade)
+      formData.append('categoria_id', form.categoria_id.toString())
       
-      // Upload image separately if provided
-      if (form.image && newProduct?.id) {
-        // TODO: Implement image upload when backend is ready
-        // await productsStore.uploadProductImage(newProduct.id, form.image)
+      // Adicionar imagem se fornecida
+      if (form.image) {
+        formData.append('imagem', form.image)
       }
+      
+      await productsStore.createProduct(formData)
     }
     
     // Redirecionar para lista de produtos

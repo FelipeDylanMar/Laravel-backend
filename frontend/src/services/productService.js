@@ -25,8 +25,14 @@ class ProductService {
   // Criar novo produto
   async createProduct(productData) {
     try {
-      const response = await apiService.post('/products', productData)
-      return response
+      // Se productData é FormData, usar upload, senão usar post normal
+      if (productData instanceof FormData) {
+        const response = await apiService.upload('/products', productData)
+        return response
+      } else {
+        const response = await apiService.post('/products', productData)
+        return response
+      }
     } catch (error) {
       throw new Error(error.message || 'Erro ao criar produto')
     }

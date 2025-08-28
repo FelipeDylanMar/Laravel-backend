@@ -88,12 +88,6 @@ export const useProductsStore = defineStore('products', () => {
     error.value = null
     
     try {
-      // Validar dados antes de enviar
-      const validation = productService.validateProduct(productData)
-      if (!validation.isValid) {
-        throw new Error(validation.errors.join(', '))
-      }
-      
       const response = await productService.createProduct(productData)
       
       // Adicionar o novo produto à lista
@@ -114,12 +108,6 @@ export const useProductsStore = defineStore('products', () => {
     error.value = null
     
     try {
-      // Validar dados antes de enviar
-      const validation = productService.validateProduct(productData)
-      if (!validation.isValid) {
-        throw new Error(validation.errors.join(', '))
-      }
-      
       const response = await productService.updateProduct(id, productData)
       const updatedProduct = response.data || response
       

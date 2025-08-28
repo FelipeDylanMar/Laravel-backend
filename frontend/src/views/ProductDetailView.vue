@@ -61,32 +61,7 @@
         <div class="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
           <!-- Image Gallery -->
           <div class="flex flex-col-reverse">
-            <!-- Image selector -->
-            <div v-if="productImages.length > 1" class="hidden mt-6 w-full max-w-2xl mx-auto sm:block lg:max-w-none">
-              <div class="grid grid-cols-4 gap-6" aria-orientation="horizontal">
-                <button
-                  v-for="(image, index) in productImages"
-                  :key="index"
-                  class="relative h-24 bg-white rounded-md flex items-center justify-center text-sm font-medium uppercase text-gray-900 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring focus:ring-offset-4 focus:ring-opacity-50 transition-all duration-200"
-                  :class="{
-                    'ring-2 ring-purple-500 shadow-lg': selectedImageIndex === index,
-                    'ring-1 ring-gray-300': selectedImageIndex !== index
-                  }"
-                  @click="selectedImageIndex = index"
-                >
-                  <span class="sr-only">{{ image.alt }}</span>
-                  <span class="absolute inset-0 rounded-md overflow-hidden">
-                    <img 
-                      :src="image.src" 
-                      :alt="image.alt" 
-                      class="w-full h-full object-center object-cover"
-                      @error="handleImageError($event, index)"
-                      loading="lazy"
-                    />
-                  </span>
-                </button>
-              </div>
-            </div>
+
 
             <!-- Main image -->
             <div class="w-full">
@@ -248,7 +223,7 @@ const router = useRouter()
 const productsStore = useProductsStore()
 
 // State
-const selectedImageIndex = ref(0)
+
 const imageError = ref(false)
 const imageLoaded = ref(false)
 
@@ -265,33 +240,30 @@ const productImages = computed(() => {
   
   // Se o produto tem imagem, usar ela
   if (product.value.imagem) {
-    // Tentar diferentes formatos de URL para a imagem
-    const imageUrls = [
-      `http://127.0.0.1:8000/storage/images/${product.value.imagem}`,
-      `http://127.0.0.1:8000/images/${product.value.imagem}`,
-      `/images/${product.value.imagem}`,
-      product.value.imagem
-    ]
-    
-    imageUrls.forEach((url, index) => {
-      images.push({
-        src: url,
-        alt: `${product.value.nome} - Imagem ${index + 1}`
-      })
+    images.push({
+      src: `http://127.0.0.1:8000/images/${product.value.imagem}`,
+      alt: `${product.value.nome} - Imagem principal`
+    })
+  } else if (product.value.image_url) {
+    images.push({
+      src: product.value.image_url,
+      alt: `${product.value.nome} - Imagem principal`
     })
   }
   
-  // Sempre adicionar uma imagem placeholder como fallback
-  images.push({
-    src: 'https://via.placeholder.com/600x600/f3f4f6/9ca3af?text=Produto+INNYX',
-    alt: 'Imagem do produto não disponível'
-  })
+  // Se não há imagens, adicionar placeholder
+  if (images.length === 0) {
+    images.push({
+      src: 'https://via.placeholder.com/600x600/f3f4f6/9ca3af?text=Produto+INNYX',
+      alt: 'Imagem do produto não disponível'
+    })
+  }
   
   return images
 })
 
 const selectedImage = computed(() => {
-  return productImages.value[selectedImageIndex.value] || null
+  return productImages.value[0] || null
 })
 
 // Methods
@@ -301,7 +273,6 @@ const fetchProduct = async () => {
     // Reset image states when loading new product
     imageError.value = false
     imageLoaded.value = false
-    selectedImageIndex.value = 0
   } catch (err) {
     console.error('Erro ao carregar produto:', err)
   }
@@ -319,12 +290,6 @@ const handleMainImageError = (event) => {
   console.warn('Erro ao carregar imagem principal:', event.target.src)
   imageError.value = true
   imageLoaded.value = false
-  
-  // Tentar próxima imagem disponível
-  if (selectedImageIndex.value < productImages.value.length - 1) {
-    selectedImageIndex.value++
-    imageError.value = false
-  }
 }
 
 const deleteProduct = async () => {
@@ -373,7 +338,6 @@ const getCategoryName = (category) => {
 const resetImageStates = () => {
   imageError.value = false
   imageLoaded.value = false
-  selectedImageIndex.value = 0
 }
 
 
