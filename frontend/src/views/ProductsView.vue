@@ -120,13 +120,13 @@
               <div class="flex flex-wrap gap-2 justify-center">
                 <router-link
                   :to="`/products/${product.id}`"
-                  class="text-blue-600 hover:text-blue-900 text-xs font-medium transition-colors px-2 py-1 bg-blue-50 rounded hover:bg-blue-100"
+                  class="text-innyx-primary-600 hover:text-innyx-primary-800 text-xs font-medium transition-colors px-2 py-1 bg-innyx-primary-50 rounded hover:bg-innyx-primary-100"
                 >
                   Ver
                 </router-link>
                 <router-link
                   :to="`/products/${product.id}/edit`"
-                  class="text-green-600 hover:text-green-900 text-xs font-medium transition-colors px-2 py-1 bg-green-50 rounded hover:bg-green-100"
+                  class="text-innyx-secondary-600 hover:text-innyx-secondary-800 text-xs font-medium transition-colors px-2 py-1 bg-innyx-secondary-50 rounded hover:bg-innyx-secondary-100"
                 >
                   Editar
                 </router-link>
@@ -207,8 +207,8 @@
                 @click="goToPage(page)"
                 :class="[
                   page === currentPage
-                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
+                    ? 'z-10 bg-innyx-primary-50 border-innyx-primary-500 text-innyx-primary-600'
+                    : 'bg-white border-gray-300 text-gray-500 hover:bg-innyx-primary-50',
                   'relative inline-flex items-center border px-4 py-2 text-sm font-medium focus:z-20'
                 ]"
               >

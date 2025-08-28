@@ -4,25 +4,25 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <!-- Bloco de Informações de Teste -->
         <div class="order-2 lg:order-1">
-          <div class="card bg-blue-50 border-blue-200">
+          <div class="card bg-innyx-primary-50 border-innyx-primary-200">
             <div class="text-center mb-6">
-              <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-innyx-primary-100 mb-4">
+                <svg class="h-6 w-6 text-innyx-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-bold text-blue-900 mb-2">
+              <h3 class="text-xl font-bold text-innyx-primary-900 mb-2">
                 Credenciais para Teste
               </h3>
-              <p class="text-sm text-blue-700 mb-6">
+              <p class="text-sm text-innyx-primary-700 mb-6">
                 Use as credenciais abaixo para acessar o sistema de demonstração
               </p>
             </div>
             
             <div class="space-y-4">
-              <div class="bg-white rounded-lg p-4 border border-blue-200">
+              <div class="bg-white rounded-lg p-4 border border-innyx-primary-200">
                 <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-                  <svg class="h-4 w-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="h-4 w-4 text-innyx-secondary-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                   </svg>
                   Usuário Principal
@@ -39,9 +39,9 @@
                 </div>
               </div>
               
-              <div class="bg-white rounded-lg p-4 border border-blue-200">
+              <div class="bg-white rounded-lg p-4 border border-innyx-primary-200">
                 <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-                  <svg class="h-4 w-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="h-4 w-4 text-innyx-primary-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                   </svg>
                   Usuário de Teste
@@ -85,7 +85,7 @@
           </h2>
           <p class="mt-2 text-sm text-gray-600">
             Ou
-            <router-link to="/" class="font-medium text-blue-600 hover:text-blue-500">
+            <router-link to="/" class="font-medium text-innyx-primary-600 hover:text-innyx-primary-500">
               voltar para a página inicial
             </router-link>
           </p>
@@ -127,7 +127,7 @@
                 v-model="form.remember"
                 name="remember-me"
                 type="checkbox"
-                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                class="h-4 w-4 text-innyx-primary-600 focus:ring-innyx-primary-500 border-gray-300 rounded"
               />
               <label for="remember-me" class="ml-2 block text-sm text-gray-900">
                 Lembrar de mim
