@@ -14,12 +14,31 @@ class ProductController extends Controller
     {
         $query = Product::with('category');
         
-        if ($request->has('search')) {
+        // Verificar se há parâmetro de busca
+        if ($request->has('search') && !empty($request->get('search'))) {
             $search = $request->get('search');
             $query->where(function($q) use ($search) {
                 $q->where('nome', 'like', "%{$search}%")
                   ->orWhere('descricao', 'like', "%{$search}%");
             });
+        }
+        
+        // Aplicar ordenação se especificada
+        if ($request->has('sort_by')) {
+            $sortBy = $request->get('sort_by');
+            $sortOrder = $request->get('sort_order', 'asc');
+            
+            // Mapear campos do frontend para o backend
+            $fieldMap = [
+                'name' => 'nome',
+                'price' => 'preco',
+                'created_at' => 'created_at'
+            ];
+            
+            $dbField = $fieldMap[$sortBy] ?? 'nome';
+            $query->orderBy($dbField, $sortOrder);
+        } else {
+            $query->orderBy('nome', 'asc');
         }
         
         $products = $query->paginate(10);

@@ -272,11 +272,13 @@ const visiblePages = computed(() => {
 // Methods
 const fetchProducts = async (page = currentPage.value) => {
   try {
-    await productsStore.fetchProducts(page, {
+    const filters = {
       search: searchQuery.value,
       sort_by: sortBy.value,
       sort_order: sortOrder.value
-    })
+    }
+    console.log('ProductsView - Enviando filtros:', filters)
+    await productsStore.fetchProducts(page, filters)
   } catch (err) {
     console.error('Erro ao carregar produtos:', err)
   }

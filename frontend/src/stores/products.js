@@ -41,6 +41,7 @@ export const useProductsStore = defineStore('products', () => {
         ...customFilters
       }
       
+      console.log('ProductsStore - Parâmetros finais:', params)
       const response = await productService.getProducts(params)
       
       products.value = response.data || response.products || []
