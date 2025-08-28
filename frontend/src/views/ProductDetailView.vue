@@ -57,7 +57,7 @@
       </div>
 
       <!-- Product Detail -->
-      <div v-else-if="product" class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div v-else-if="product" class="card overflow-hidden">
         <div class="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
           <!-- Image Gallery -->
           <div class="flex flex-col-reverse">
@@ -185,13 +185,13 @@
             <div class="mt-8 flex space-x-3">
               <router-link
                 :to="`/products/${product.id}/edit`"
-                class="flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                class="btn-primary flex-1 text-center"
               >
                 Editar Produto
               </router-link>
               <button
                 @click="deleteProduct"
-                class="flex-1 bg-white border border-gray-300 rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                class="btn-secondary flex-1"
               >
                 Excluir
               </button>
@@ -201,7 +201,7 @@
             <div class="mt-6">
               <router-link
                 to="/products"
-                class="text-indigo-600 hover:text-indigo-500 text-sm font-medium flex items-center"
+                class="text-blue-600 hover:text-blue-500 text-sm font-medium flex items-center transition-colors"
               >
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -219,18 +219,20 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useProductsStore } from '@/stores/products'
 
 const route = useRoute()
 const router = useRouter()
+const productsStore = useProductsStore()
 
 // State
-const product = ref(null)
-const loading = ref(false)
-const error = ref('')
 const selectedImageIndex = ref(0)
 
 // Computed
 const productId = computed(() => route.params.id)
+const product = computed(() => productsStore.currentProduct)
+const loading = computed(() => productsStore.isLoading)
+const error = computed(() => productsStore.error)
 
 const productImages = computed(() => {
   if (!product.value) return []
@@ -260,35 +262,10 @@ const selectedImage = computed(() => {
 
 // Methods
 const fetchProduct = async () => {
-  loading.value = true
-  error.value = ''
-  
   try {
-    // TODO: Implementar chamada para API
-    // const response = await productService.getProduct(productId.value)
-    
-    // Simulação temporária
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    const mockProduct = {
-      id: productId.value,
-      name: 'Produto Exemplo Detalhado',
-      description: 'Esta é uma descrição detalhada do produto exemplo. Aqui você pode incluir todas as informações importantes sobre o produto, suas características, benefícios e especificações técnicas.',
-      price: 199.99,
-      category: 'electronics',
-      stock_quantity: 25,
-      image: null,
-      is_active: true,
-      sku: 'PROD-001',
-      created_at: '2024-01-15T10:30:00Z',
-      updated_at: '2024-01-20T14:45:00Z'
-    }
-    
-    product.value = mockProduct
+    await productsStore.fetchProduct(productId.value)
   } catch (err) {
-    error.value = err.message || 'Erro ao carregar produto'
-  } finally {
-    loading.value = false
+    console.error('Erro ao carregar produto:', err)
   }
 }
 
@@ -298,16 +275,11 @@ const deleteProduct = async () => {
   }
   
   try {
-    // TODO: Implementar chamada para API
-    // await productService.deleteProduct(productId.value)
-    
-    // Simulação temporária
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
+    await productsStore.deleteProduct(productId.value)
     // Redirecionar para lista de produtos
     router.push('/products')
   } catch (err) {
-    error.value = err.message || 'Erro ao excluir produto'
+    console.error('Erro ao excluir produto:', err)
   }
 }
 
@@ -352,6 +324,10 @@ const getStockStatus = (quantity) => {
 
 // Lifecycle
 onMounted(() => {
+  // Clear any previous product data
+  productsStore.clearCurrentProduct()
+  productsStore.clearError()
+  
   fetchProduct()
 })
 </script>

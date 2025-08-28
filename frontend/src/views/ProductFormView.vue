@@ -53,7 +53,7 @@
       </div>
 
       <!-- Form -->
-      <div v-else class="bg-white shadow rounded-lg">
+      <div v-else class="card">
         <form @submit.prevent="handleSubmit" class="space-y-6 p-6">
           <!-- Name -->
           <div>
@@ -66,7 +66,7 @@
                 v-model="form.name"
                 type="text"
                 required
-                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                class="input-field"
                 :class="{ 'border-red-300': errors.name }"
                 placeholder="Digite o nome do produto"
               />
@@ -85,7 +85,7 @@
                 v-model="form.description"
                 rows="4"
                 required
-                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                class="input-field"
                 :class="{ 'border-red-300': errors.description }"
                 placeholder="Digite a descrição do produto"
               ></textarea>
@@ -109,7 +109,7 @@
                 step="0.01"
                 min="0"
                 required
-                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-12 pr-12 sm:text-sm border-gray-300 rounded-md"
+                class="input-field pl-12 pr-12"
                 :class="{ 'border-red-300': errors.price }"
                 placeholder="0,00"
               />
@@ -126,17 +126,13 @@
               <select
                 id="category"
                 v-model="form.category"
-                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                class="input-field"
                 :class="{ 'border-red-300': errors.category }"
               >
                 <option value="">Selecione uma categoria</option>
-                <option value="electronics">Eletrônicos</option>
-                <option value="clothing">Roupas</option>
-                <option value="books">Livros</option>
-                <option value="home">Casa e Jardim</option>
-                <option value="sports">Esportes</option>
-                <option value="toys">Brinquedos</option>
-                <option value="other">Outros</option>
+                <option v-for="category in categories" :key="category.id" :value="category.id">
+                  {{ category.nome }}
+                </option>
               </select>
               <p v-if="errors.category" class="mt-2 text-sm text-red-600">{{ errors.category }}</p>
             </div>
@@ -153,7 +149,7 @@
                 v-model="form.stock_quantity"
                 type="number"
                 min="0"
-                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                class="input-field"
                 :class="{ 'border-red-300': errors.stock_quantity }"
                 placeholder="0"
               />
@@ -239,14 +235,14 @@
           <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
             <router-link
               to="/products"
-              class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              class="btn-secondary"
             >
               Cancelar
             </router-link>
             <button
               type="submit"
               :disabled="submitting"
-              class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span v-if="submitting" class="flex items-center">
                 <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -269,9 +265,12 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useProductsStore } from '@/stores/products'
+import { productService } from '@/services/productService'
 
 const route = useRoute()
 const router = useRouter()
+const productsStore = useProductsStore()
 
 // State
 const loading = ref(false)
@@ -279,6 +278,7 @@ const submitting = ref(false)
 const submitError = ref('')
 const imagePreview = ref('')
 const imageInput = ref(null)
+const categories = ref([])
 
 const form = reactive({
   name: '',
@@ -303,6 +303,26 @@ const errors = reactive({
 const isEditing = computed(() => !!route.params.id)
 const productId = computed(() => route.params.id)
 
+// Carregar categorias da API
+const loadCategories = async () => {
+  try {
+    const response = await productService.getCategories()
+    categories.value = response.data
+  } catch (error) {
+    console.error('Erro ao carregar categorias:', error)
+    // Fallback para categorias padrão
+    categories.value = [
+      { id: 1, nome: 'Eletrônicos' },
+      { id: 2, nome: 'Roupas' },
+      { id: 3, nome: 'Livros' },
+      { id: 4, nome: 'Casa e Jardim' },
+      { id: 5, nome: 'Esportes' },
+      { id: 6, nome: 'Brinquedos' },
+      { id: 7, nome: 'Outros' }
+    ]
+  }
+}
+
 // Methods
 const fetchProduct = async () => {
   if (!isEditing.value) return
@@ -310,26 +330,26 @@ const fetchProduct = async () => {
   loading.value = true
   
   try {
-    // TODO: Implementar chamada para API
-    // const response = await productService.getProduct(productId.value)
+    await productsStore.fetchProduct(productId.value)
     
-    // Simulação temporária
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    const mockProduct = {
-      id: productId.value,
-      name: 'Produto Exemplo',
-      description: 'Descrição do produto exemplo',
-      price: 99.99,
-      category: 'electronics',
-      stock_quantity: 10,
-      image: null,
-      is_active: true
+    if (productsStore.currentProduct) {
+      Object.assign(form, {
+        name: productsStore.currentProduct.name || '',
+        description: productsStore.currentProduct.description || '',
+        price: productsStore.currentProduct.price || '',
+        category: productsStore.currentProduct.category || '',
+        stock_quantity: productsStore.currentProduct.stock_quantity || 0,
+        image: null, // Reset image field for editing
+        is_active: productsStore.currentProduct.is_active !== undefined ? productsStore.currentProduct.is_active : true
+      })
+      
+      // Set image preview if product has an image
+      if (productsStore.currentProduct.image) {
+        imagePreview.value = productsStore.currentProduct.image
+      }
     }
-    
-    Object.assign(form, mockProduct)
   } catch (err) {
-    submitError.value = err.message || 'Erro ao carregar produto'
+    submitError.value = productsStore.error || 'Erro ao carregar produto'
   } finally {
     loading.value = false
   }
@@ -373,31 +393,36 @@ const handleSubmit = async () => {
   submitError.value = ''
   
   try {
-    const formData = new FormData()
-    
-    Object.keys(form).forEach(key => {
-      if (key === 'image' && form[key]) {
-        formData.append(key, form[key])
-      } else if (key !== 'image') {
-        formData.append(key, form[key])
-      }
-    })
-    
-    if (isEditing.value) {
-      // TODO: Implementar chamada para API de atualização
-      // await productService.updateProduct(productId.value, formData)
-    } else {
-      // TODO: Implementar chamada para API de criação
-      // await productService.createProduct(formData)
+    const productData = {
+      nome: form.name,
+      descricao: form.description,
+      preco: parseFloat(form.price),
+      data_validade: '2025-12-31', // Data padrão futura
+      categoria_id: form.category ? parseInt(form.category) : 1 // ID da categoria
     }
     
-    // Simulação temporária
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    if (isEditing.value) {
+      await productsStore.updateProduct(productId.value, productData)
+      
+      // Upload image separately if provided
+      if (form.image) {
+        // TODO: Implement image upload when backend is ready
+        // await productsStore.uploadProductImage(productId.value, form.image)
+      }
+    } else {
+      const newProduct = await productsStore.createProduct(productData)
+      
+      // Upload image separately if provided
+      if (form.image && newProduct?.id) {
+        // TODO: Implement image upload when backend is ready
+        // await productsStore.uploadProductImage(newProduct.id, form.image)
+      }
+    }
     
     // Redirecionar para lista de produtos
     router.push('/products')
   } catch (err) {
-    submitError.value = err.message || 'Erro ao salvar produto'
+    submitError.value = productsStore.error || 'Erro ao salvar produto'
   } finally {
     submitting.value = false
   }
@@ -443,6 +468,12 @@ const removeImage = () => {
 
 // Lifecycle
 onMounted(() => {
+  // Clear any previous product data
+  productsStore.clearCurrentProduct()
+  productsStore.clearError()
+  
+  // Carregar categorias e produto
+  loadCategories()
   fetchProduct()
 })
 </script>

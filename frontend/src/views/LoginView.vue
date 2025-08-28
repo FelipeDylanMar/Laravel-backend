@@ -1,7 +1,84 @@
 <template>
   <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-      <div class="card">
+    <div class="max-w-6xl w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <!-- Bloco de Informações de Teste -->
+        <div class="order-2 lg:order-1">
+          <div class="card bg-blue-50 border-blue-200">
+            <div class="text-center mb-6">
+              <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-blue-900 mb-2">
+                Credenciais para Teste
+              </h3>
+              <p class="text-sm text-blue-700 mb-6">
+                Use as credenciais abaixo para acessar o sistema de demonstração
+              </p>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="bg-white rounded-lg p-4 border border-blue-200">
+                <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg class="h-4 w-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Usuário Principal
+                </h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Email:</span>
+                    <code class="bg-gray-100 px-2 py-1 rounded text-gray-800 font-mono">teste@exemplo.com</code>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Senha:</span>
+                    <code class="bg-gray-100 px-2 py-1 rounded text-gray-800 font-mono">123456</code>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-lg p-4 border border-blue-200">
+                <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg class="h-4 w-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Usuário de Teste
+                </h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Email:</span>
+                    <code class="bg-gray-100 px-2 py-1 rounded text-gray-800 font-mono">test@example.com</code>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Senha:</span>
+                    <code class="bg-gray-100 px-2 py-1 rounded text-gray-800 font-mono">password</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div class="flex items-start">
+                <svg class="h-5 w-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <div>
+                  <h5 class="text-sm font-medium text-yellow-800 mb-1">Ambiente de Teste</h5>
+                  <p class="text-xs text-yellow-700">
+                    Este é um ambiente de demonstração. Os dados são fictícios e podem ser resetados a qualquer momento.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Formulário de Login -->
+        <div class="order-1 lg:order-2">
+          <div class="max-w-md mx-auto space-y-8">
+            <div class="card">
         <div class="text-center mb-6">
           <h2 class="text-3xl font-extrabold text-gray-900">
             Entrar na sua conta
@@ -89,6 +166,9 @@
             </div>
           </div>
         </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

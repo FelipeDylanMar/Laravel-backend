@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Category;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -19,5 +20,21 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+        
+        // Criar usuário principal
+        User::create([
+            'name' => 'Usuário Principal',
+            'email' => 'teste@exemplo.com',
+            'password' => bcrypt('123456'),
+        ]);
+        
+        // Criar categorias padrão
+        Category::create(['nome' => 'Eletrônicos']);
+        Category::create(['nome' => 'Roupas']);
+        Category::create(['nome' => 'Livros']);
+        Category::create(['nome' => 'Casa e Jardim']);
+        Category::create(['nome' => 'Esportes']);
+        Category::create(['nome' => 'Brinquedos']);
+        Category::create(['nome' => 'Outros']);
     }
 }

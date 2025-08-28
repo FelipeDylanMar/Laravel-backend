@@ -113,20 +113,20 @@ class ProductService {
   validateProduct(productData) {
     const errors = []
 
-    if (!productData.name || productData.name.trim().length < 3) {
+    if (!productData.nome || productData.nome.trim().length < 3) {
       errors.push('Nome deve ter pelo menos 3 caracteres')
     }
 
-    if (!productData.description || productData.description.trim().length < 10) {
+    if (!productData.descricao || productData.descricao.trim().length < 10) {
       errors.push('Descrição deve ter pelo menos 10 caracteres')
     }
 
-    if (!productData.price || productData.price <= 0) {
+    if (!productData.preco || productData.preco <= 0) {
       errors.push('Preço deve ser maior que zero')
     }
 
-    if (!productData.quantity || productData.quantity < 0) {
-      errors.push('Quantidade não pode ser negativa')
+    if (!productData.categoria_id) {
+      errors.push('Categoria é obrigatória')
     }
 
     return {
