@@ -9,6 +9,9 @@ const isAuthenticated = computed(() => {
 <template>
   <div class="px-4 py-6 sm:px-0">
     <div class="text-center">
+      <div class="flex justify-center mb-8">
+        <img src="@/assets/innyx-logo-embedded.svg" alt="INNYX Logo" class="h-16 w-auto" />
+      </div>
       <h1 class="text-4xl font-bold text-gray-900 mb-8">
         Sistema de Gerenciamento de Produtos
       </h1>

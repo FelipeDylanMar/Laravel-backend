@@ -80,6 +80,9 @@
           <div class="max-w-md mx-auto space-y-8">
             <div class="card">
         <div class="text-center mb-6">
+          <div class="flex justify-center mb-6">
+            <img src="@/assets/innyx-logo-embedded.svg" alt="INNYX Logo" class="h-12 w-auto" />
+          </div>
           <h2 class="text-3xl font-extrabold text-gray-900">
             Entrar na sua conta
           </h2>

@@ -4,7 +4,10 @@
       <!-- Header -->
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-          <h1 class="text-2xl font-semibold text-gray-900">Produtos</h1>
+          <div class="flex items-center space-x-3 mb-2">
+            <img src="@/assets/innyx-logo-embedded.svg" alt="INNYX Logo" class="h-8 w-auto mr-3" />
+            <h1 class="text-2xl font-semibold text-gray-900">Produtos</h1>
+          </div>
           <p class="mt-2 text-sm text-gray-700">
             Lista de todos os produtos cadastrados no sistema.
           </p>

@@ -28,9 +28,10 @@ onMounted(() => {
     <nav class="navbar">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-          <div class="flex items-center">
+          <div class="flex items-center space-x-3">
+            <img src="@/assets/innyx-logo-embedded.svg" alt="INNYX Logo" class="h-8 w-auto" />
             <router-link to="/" class="text-xl font-bold text-white hover:text-innyx-primary-200 transition-colors">
-              Sistema de Produtos INNYX
+              Sistema de Produtos
             </router-link>
           </div>
           

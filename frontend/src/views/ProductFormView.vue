@@ -38,9 +38,12 @@
           </ol>
         </nav>
         <div class="mt-4">
-          <h1 class="text-2xl font-semibold text-gray-900">
-            {{ isEditing ? 'Editar Produto' : 'Novo Produto' }}
-          </h1>
+          <div class="flex items-center space-x-3 mb-2">
+            <img src="@/assets/innyx-logo-embedded.svg" alt="INNYX Logo" class="h-8 w-auto mr-3" />
+            <h1 class="text-2xl font-semibold text-gray-900">
+              {{ isEditing ? 'Editar Produto' : 'Novo Produto' }}
+            </h1>
+          </div>
           <p class="mt-2 text-sm text-gray-700">
             {{ isEditing ? 'Atualize as informações do produto.' : 'Preencha as informações para criar um novo produto.' }}
           </p>
