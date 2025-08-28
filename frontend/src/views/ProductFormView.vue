@@ -326,8 +326,10 @@ const fetchProduct = async () => {
       })
       
       // Set image preview if product has an image
-      if (productsStore.currentProduct.image) {
-        imagePreview.value = productsStore.currentProduct.image
+      if (productsStore.currentProduct.image_url) {
+        imagePreview.value = productsStore.currentProduct.image_url
+      } else if (productsStore.currentProduct.imagem) {
+        imagePreview.value = `http://127.0.0.1:8000/images/${productsStore.currentProduct.imagem}`
       }
     }
   } catch (err) {

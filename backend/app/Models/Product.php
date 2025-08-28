@@ -21,8 +21,12 @@ class Product extends Model
         'data_validade' => 'date'
     ];
 
+    // protected $appends = ['image_url'];
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'categoria_id');
     }
+
+
 }

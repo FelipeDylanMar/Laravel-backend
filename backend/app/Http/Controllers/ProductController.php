@@ -24,6 +24,12 @@ class ProductController extends Controller
         
         $products = $query->paginate(10);
         
+        // Adicionar image_url manualmente para cada produto
+        $products->getCollection()->transform(function ($product) {
+            $product->image_url = $product->imagem ? url('images/' . $product->imagem) : null;
+            return $product;
+        });
+        
         return response()->json($products);
     }
 
@@ -46,6 +52,7 @@ class ProductController extends Controller
         
         $product = Product::create($validated);
         $product->load('category');
+        $product->image_url = $product->imagem ? url('images/' . $product->imagem) : null;
         
         return response()->json($product, 201);
     }
@@ -53,6 +60,7 @@ class ProductController extends Controller
     public function show(string $id): JsonResponse
     {
         $product = Product::with('category')->findOrFail($id);
+        $product->image_url = $product->imagem ? url('images/' . $product->imagem) : null;
         return response()->json($product);
     }
 
@@ -81,6 +89,7 @@ class ProductController extends Controller
         
         $product->update($validated);
         $product->load('category');
+        $product->image_url = $product->imagem ? url('images/' . $product->imagem) : null;
         
         return response()->json($product);
     }

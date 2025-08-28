@@ -97,9 +97,9 @@
         >
           <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200">
             <img
-              v-if="product.image"
-              :src="product.image"
-              :alt="product.name"
+              v-if="product.image_url || product.imagem"
+              :src="product.image_url || (product.imagem ? `http://127.0.0.1:8000/images/${product.imagem}` : '')"
+              :alt="product.nome || product.name"
               class="h-48 w-full object-cover object-center"
             />
             <div v-else class="h-48 w-full bg-gray-200 flex items-center justify-center">
@@ -109,11 +109,11 @@
             </div>
           </div>
           <div class="p-4">
-            <h3 class="text-lg font-medium text-gray-900 truncate">{{ product.name }}</h3>
-            <p class="mt-1 text-sm text-gray-500 line-clamp-2">{{ product.description }}</p>
+            <h3 class="text-lg font-medium text-gray-900 truncate">{{ product.nome || product.name }}</h3>
+            <p class="mt-1 text-sm text-gray-500 line-clamp-2">{{ product.descricao || product.description }}</p>
             <div class="mt-3 flex items-center justify-between">
               <p class="text-lg font-semibold text-gray-900">
-                R$ {{ formatPrice(product.price) }}
+                R$ {{ formatPrice(product.preco || product.price) }}
               </p>
               <div class="flex space-x-2">
                 <router-link
@@ -324,10 +324,14 @@ const deleteProduct = async (id) => {
 }
 
 const formatPrice = (price) => {
+  const numericPrice = parseFloat(price)
+  if (isNaN(numericPrice) || numericPrice < 0) {
+    return '0,00'
+  }
   return new Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(price)
+  }).format(numericPrice)
 }
 
 const handleAddProduct = () => {
