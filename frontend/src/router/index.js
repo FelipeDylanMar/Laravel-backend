@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 // Lazy loading das views
 const Home = () => import('../views/HomeView.vue')
@@ -56,13 +57,18 @@ const router = createRouter({
 })
 
 // Guard de autenticação
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('auth_token')
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-  if (requiresAuth && !token) {
+  // Verificar autenticação se houver token
+  if (authStore.token && !authStore.user) {
+    await authStore.checkAuth()
+  }
+
+  if (requiresAuth && !authStore.isAuthenticated) {
     next('/login')
-  } else if (to.name === 'Login' && token) {
+  } else if (to.name === 'Login' && authStore.isAuthenticated) {
     next('/products')
   } else {
     next()

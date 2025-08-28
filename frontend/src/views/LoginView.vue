@@ -95,12 +95,12 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
-const loading = ref(false)
-const error = ref('')
+const authStore = useAuthStore()
 
 const form = reactive({
   email: '',
@@ -108,32 +108,24 @@ const form = reactive({
   remember: false
 })
 
+// Usar computed para acessar o estado do store
+const loading = computed(() => authStore.isLoading)
+const error = computed(() => authStore.error)
+
 const handleLogin = async () => {
-  loading.value = true
-  error.value = ''
+  authStore.clearError()
   
   try {
-    // TODO: Implementar chamada para API de login
-    // const response = await authService.login(form)
+    await authStore.login({
+      email: form.email,
+      password: form.password
+    })
     
-    // Simulação temporária
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Simular token de autenticação
-    const token = 'fake-jwt-token-' + Date.now()
-    localStorage.setItem('auth_token', token)
-    localStorage.setItem('user_data', JSON.stringify({
-      id: 1,
-      name: 'Usuário Teste',
-      email: form.email
-    }))
-    
-    // Redirecionar para produtos
+    // Redirecionar para produtos após login bem-sucedido
     router.push('/products')
   } catch (err) {
-    error.value = err.message || 'Erro ao fazer login. Verifique suas credenciais.'
-  } finally {
-    loading.value = false
+    // O erro já é tratado no store
+    console.error('Erro no login:', err)
   }
 }
 </script>

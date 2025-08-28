@@ -1,16 +1,22 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
-const isAuthenticated = computed(() => {
-  return localStorage.getItem('auth_token') !== null
-})
+const authStore = useAuthStore()
+
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const logout = () => {
-  localStorage.removeItem('auth_token')
+  authStore.logout()
   router.push('/login')
 }
+
+// Verificar autenticação ao carregar a aplicação
+onMounted(() => {
+  authStore.checkAuth()
+})
 </script>
 
 <template>

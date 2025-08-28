@@ -12,7 +12,7 @@
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <router-link
             to="/products/new"
-            class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+            class="btn-primary text-sm"
           >
             Adicionar Produto
           </router-link>
@@ -35,7 +35,7 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Buscar por nome ou descrição..."
-                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                class="input-field pl-10"
                 @input="handleSearch"
               />
             </div>
@@ -92,7 +92,7 @@
         <div
           v-for="product in products"
           :key="product.id"
-          class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200"
+          class="card hover:shadow-lg transition-shadow duration-200"
         >
           <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200">
             <img
@@ -117,19 +117,19 @@
               <div class="flex space-x-2">
                 <router-link
                   :to="`/products/${product.id}`"
-                  class="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+                  class="text-blue-600 hover:text-blue-900 text-sm font-medium transition-colors"
                 >
                   Ver
                 </router-link>
                 <router-link
                   :to="`/products/${product.id}/edit`"
-                  class="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+                  class="text-blue-600 hover:text-blue-900 text-sm font-medium transition-colors"
                 >
                   Editar
                 </router-link>
                 <button
                   @click="deleteProduct(product.id)"
-                  class="text-red-600 hover:text-red-900 text-sm font-medium"
+                  class="text-red-600 hover:text-red-900 text-sm font-medium transition-colors"
                 >
                   Excluir
                 </button>
@@ -149,7 +149,7 @@
         <div class="mt-6">
           <router-link
             to="/products/new"
-            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="btn-primary text-sm"
           >
             Adicionar Produto
           </router-link>
@@ -232,22 +232,26 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useProductsStore } from '@/stores/products'
 
 const router = useRouter()
+const productsStore = useProductsStore()
 
 // State
-const products = ref([])
-const loading = ref(false)
-const error = ref('')
 const searchQuery = ref('')
 const sortBy = ref('name')
 const sortOrder = ref('asc')
-const currentPage = ref(1)
-const perPage = ref(12)
-const total = ref(0)
+
+// Computed properties from store
+const products = computed(() => productsStore.products)
+const loading = computed(() => productsStore.isLoading)
+const error = computed(() => productsStore.error)
+const currentPage = computed(() => productsStore.currentPage)
+const totalPages = computed(() => productsStore.totalPages)
+const total = computed(() => productsStore.totalProducts)
+const perPage = computed(() => productsStore.pagination.per_page)
 
 // Computed
-const totalPages = computed(() => Math.ceil(total.value / perPage.value))
 const visiblePages = computed(() => {
   const pages = []
   const start = Math.max(1, currentPage.value - 2)
@@ -261,80 +265,44 @@ const visiblePages = computed(() => {
 })
 
 // Methods
-const fetchProducts = async () => {
-  loading.value = true
-  error.value = ''
-  
+const fetchProducts = async (page = currentPage.value) => {
   try {
-    // TODO: Implementar chamada para API
-    // const response = await productService.getProducts({
-    //   page: currentPage.value,
-    //   per_page: perPage.value,
-    //   search: searchQuery.value,
-    //   sort_by: sortBy.value,
-    //   sort_order: sortOrder.value
-    // })
-    
-    // Simulação temporária
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // Dados simulados
-    const mockProducts = [
-      {
-        id: 1,
-        name: 'Produto Exemplo 1',
-        description: 'Descrição do produto exemplo 1',
-        price: 99.99,
-        image: null
-      },
-      {
-        id: 2,
-        name: 'Produto Exemplo 2',
-        description: 'Descrição do produto exemplo 2',
-        price: 149.99,
-        image: null
-      }
-    ]
-    
-    products.value = mockProducts
-    total.value = mockProducts.length
+    await productsStore.fetchProducts(page, {
+      search: searchQuery.value,
+      sort_by: sortBy.value,
+      sort_order: sortOrder.value
+    })
   } catch (err) {
-    error.value = err.message || 'Erro ao carregar produtos'
-  } finally {
-    loading.value = false
+    console.error('Erro ao carregar produtos:', err)
   }
 }
 
 const handleSearch = () => {
-  currentPage.value = 1
-  fetchProducts()
+  fetchProducts(1)
 }
 
 const handleSort = () => {
-  fetchProducts()
+  fetchProducts(1)
 }
 
 const toggleSortOrder = () => {
   sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
-  fetchProducts()
+  fetchProducts(1)
 }
 
 const goToPage = (page) => {
-  currentPage.value = page
-  fetchProducts()
+  fetchProducts(page)
 }
 
 const previousPage = () => {
   if (currentPage.value > 1) {
-    currentPage.value--
-    fetchProducts()
+    fetchProducts(currentPage.value - 1)
   }
 }
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
-    currentPage.value++
-    fetchProducts()
+    fetchProducts(currentPage.value + 1)
   }
 }
 
@@ -344,14 +312,11 @@ const deleteProduct = async (id) => {
   }
   
   try {
-    // TODO: Implementar chamada para API
-    // await productService.deleteProduct(id)
-    
-    // Simulação temporária
-    products.value = products.value.filter(p => p.id !== id)
-    total.value--
+    await productsStore.deleteProduct(id)
+    // Recarregar a página atual após exclusão
+    await fetchProducts()
   } catch (err) {
-    error.value = err.message || 'Erro ao excluir produto'
+    console.error('Erro ao excluir produto:', err)
   }
 }
 
