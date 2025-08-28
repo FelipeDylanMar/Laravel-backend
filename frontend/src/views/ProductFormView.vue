@@ -96,12 +96,9 @@
           <!-- Price -->
           <div>
             <label for="preco" class="block text-sm font-medium text-gray-700">
-              Preço *
+              Preço (R$) *
             </label>
-            <div class="mt-1 relative rounded-md shadow-sm">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span class="text-gray-500 sm:text-sm">R$</span>
-              </div>
+            <div class="mt-1">
               <input
                 id="preco"
                 v-model="form.preco"
@@ -109,7 +106,7 @@
                 step="0.01"
                 min="0"
                 required
-                class="input-field pl-12 pr-12"
+                class="input-field"
                 :class="{ 'border-red-300': errors.preco }"
                 placeholder="0,00"
               />

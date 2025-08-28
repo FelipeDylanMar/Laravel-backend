@@ -26,19 +26,19 @@
           <div class="flex-1">
             <label for="search" class="sr-only">Buscar produtos</label>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
-              </div>
               <input
                 id="search"
                 v-model="searchQuery"
                 type="text"
                 placeholder="Buscar por nome ou descrição..."
-                class="input-field pl-10"
+                class="input-field pr-10"
                 @input="handleSearch"
               />
+              <div v-show="!searchQuery" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </div>
             </div>
           </div>
           <div class="flex gap-2">
@@ -89,13 +89,13 @@
       </div>
 
       <!-- Products Grid -->
-      <div v-else-if="products.length > 0" class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div v-else-if="products.length > 0" class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         <div
           v-for="product in products"
           :key="product.id"
-          class="card hover:shadow-lg transition-shadow duration-200"
+          class="card hover:shadow-lg transition-shadow duration-200 flex flex-col h-full"
         >
-          <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200">
+          <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 rounded-t-lg">
             <img
               v-if="product.image_url || product.imagem"
               :src="product.image_url || (product.imagem ? `http://127.0.0.1:8000/images/${product.imagem}` : '')"
@@ -108,29 +108,31 @@
               </svg>
             </div>
           </div>
-          <div class="p-4">
-            <h3 class="text-lg font-medium text-gray-900 truncate">{{ product.nome || product.name }}</h3>
-            <p class="mt-1 text-sm text-gray-500 line-clamp-2">{{ product.descricao || product.description }}</p>
-            <div class="mt-3 flex items-center justify-between">
-              <p class="text-lg font-semibold text-gray-900">
-                R$ {{ formatPrice(product.preco || product.price) }}
-              </p>
-              <div class="flex space-x-2">
+          <div class="p-4 flex flex-col flex-grow">
+            <h3 class="text-base font-medium text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">{{ product.nome || product.name }}</h3>
+            <p class="text-sm text-gray-500 line-clamp-3 flex-grow mb-3 min-h-[3.75rem]">{{ product.descricao || product.description }}</p>
+            <div class="mt-auto">
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-lg font-semibold text-gray-900 truncate">
+                  R$ {{ formatPrice(product.preco || product.price) }}
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2 justify-center">
                 <router-link
                   :to="`/products/${product.id}`"
-                  class="text-blue-600 hover:text-blue-900 text-sm font-medium transition-colors"
+                  class="text-blue-600 hover:text-blue-900 text-xs font-medium transition-colors px-2 py-1 bg-blue-50 rounded hover:bg-blue-100"
                 >
                   Ver
                 </router-link>
                 <router-link
                   :to="`/products/${product.id}/edit`"
-                  class="text-blue-600 hover:text-blue-900 text-sm font-medium transition-colors"
+                  class="text-green-600 hover:text-green-900 text-xs font-medium transition-colors px-2 py-1 bg-green-50 rounded hover:bg-green-100"
                 >
                   Editar
                 </router-link>
                 <button
                   @click="deleteProduct(product.id)"
-                  class="text-red-600 hover:text-red-900 text-sm font-medium transition-colors"
+                  class="text-red-600 hover:text-red-900 text-xs font-medium transition-colors px-2 py-1 bg-red-50 rounded hover:bg-red-100"
                 >
                   Excluir
                 </button>

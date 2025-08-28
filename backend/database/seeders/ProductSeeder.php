@@ -27,6 +27,7 @@ class ProductSeeder extends Seeder
                 'preco' => 1299.99,
                 'categoria_id' => $categories->where('nome', 'Eletrônicos')->first()->id,
                 'data_validade' => now()->addYears(2),
+                'imagem' => 'smartphone.jpg',
             ],
             [
                 'nome' => 'Notebook Dell Inspiron',
@@ -34,6 +35,7 @@ class ProductSeeder extends Seeder
                 'preco' => 2499.99,
                 'categoria_id' => $categories->where('nome', 'Eletrônicos')->first()->id,
                 'data_validade' => now()->addYears(3),
+                'imagem' => 'notebook.jpg',
             ],
             [
                 'nome' => 'Camiseta Polo',
@@ -41,6 +43,7 @@ class ProductSeeder extends Seeder
                 'preco' => 89.90,
                 'categoria_id' => $categories->where('nome', 'Roupas')->first()->id,
                 'data_validade' => now()->addYears(5),
+                'imagem' => 'camiseta.jpg',
             ],
             [
                 'nome' => 'Livro: Clean Code',
@@ -48,6 +51,7 @@ class ProductSeeder extends Seeder
                 'preco' => 79.90,
                 'categoria_id' => $categories->where('nome', 'Livros')->first()->id,
                 'data_validade' => now()->addYears(10),
+                'imagem' => 'livro.jpg',
             ],
             [
                 'nome' => 'Cafeteira Elétrica',
@@ -55,6 +59,7 @@ class ProductSeeder extends Seeder
                 'preco' => 199.99,
                 'categoria_id' => $categories->where('nome', 'Casa e Jardim')->first()->id,
                 'data_validade' => now()->addYears(2),
+                'imagem' => 'cafeteira.jpg',
             ],
             [
                 'nome' => 'Tênis de Corrida Nike',
@@ -62,6 +67,7 @@ class ProductSeeder extends Seeder
                 'preco' => 299.99,
                 'categoria_id' => $categories->where('nome', 'Esportes')->first()->id,
                 'data_validade' => now()->addYears(3),
+                'imagem' => 'tenis.jpg',
             ],
             [
                 'nome' => 'Boneca Barbie',
@@ -69,6 +75,7 @@ class ProductSeeder extends Seeder
                 'preco' => 49.99,
                 'categoria_id' => $categories->where('nome', 'Brinquedos')->first()->id,
                 'data_validade' => now()->addYears(5),
+                'imagem' => 'boneca.jpg',
             ],
             [
                 'nome' => 'Fone de Ouvido Bluetooth',
@@ -76,6 +83,7 @@ class ProductSeeder extends Seeder
                 'preco' => 159.99,
                 'categoria_id' => $categories->where('nome', 'Eletrônicos')->first()->id,
                 'data_validade' => now()->addYears(2),
+                'imagem' => 'fone.jpg',
             ],
         ];
 
