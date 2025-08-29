@@ -1,20 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import UserProfile from '@/components/UserProfile.vue'
 
-const router = useRouter()
 const authStore = useAuthStore()
 const isInitializing = ref(true)
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
-
-const logout = async () => {
-  await authStore.logout()
-  router.push('/login').then(() => {
-    window.location.reload()
-  })
-}
 
 onMounted(async () => {
   try {
@@ -57,12 +49,7 @@ onMounted(async () => {
               >
                 Produtos
               </router-link>
-              <button 
-                @click="logout"
-                class="btn-danger text-sm"
-              >
-                Sair
-              </button>
+              <UserProfile />
             </div>
             
             <div class="flex items-center" v-else>
