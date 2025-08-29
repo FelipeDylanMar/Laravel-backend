@@ -234,7 +234,7 @@ const productImages = computed(() => {
   
   const images = []
   
-  // Se o produto tem imagem, usar ela
+  
   if (product.value.imagem) {
     images.push({
       src: `http://127.0.0.1:8000/images/${product.value.imagem}`,
@@ -247,7 +247,7 @@ const productImages = computed(() => {
     })
   }
   
-  // Se não há imagens, adicionar placeholder
+  
   if (images.length === 0) {
     images.push({
       src: 'https://via.placeholder.com/600x600/f3f4f6/9ca3af?text=Produto+INNYX',

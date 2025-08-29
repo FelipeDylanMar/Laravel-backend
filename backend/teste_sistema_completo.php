@@ -1,22 +1,15 @@
 <?php
 
-/**
- * Script de teste para verificar se o sistema está funcionando corretamente
- * com SQLite e todas as extensões habilitadas
- */
-
 require_once 'vendor/autoload.php';
 
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
-// Carrega o ambiente Laravel
 $app = require_once 'bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
 echo "=== TESTE DO SISTEMA DE PRODUTOS ===\n\n";
 
-// Teste 1: Verificar conexão com banco de dados
 echo "1. Testando conexão com banco de dados...\n";
 try {
     $pdo = new PDO('sqlite:' . database_path('database.sqlite'));
@@ -26,7 +19,6 @@ try {
     exit(1);
 }
 
-// Teste 2: Verificar se as tabelas existem
 echo "\n2. Verificando tabelas do banco...\n";
 $tables = ['users', 'categories', 'products', 'personal_access_tokens'];
 foreach ($tables as $table) {
@@ -38,7 +30,6 @@ foreach ($tables as $table) {
     }
 }
 
-// Teste 3: Verificar dados de exemplo
 echo "\n3. Verificando dados de exemplo...\n";
 $stmt = $pdo->query("SELECT COUNT(*) as count FROM categories");
 $categoriesCount = $stmt->fetch()['count'];
@@ -52,7 +43,6 @@ $stmt = $pdo->query("SELECT COUNT(*) as count FROM products");
 $productsCount = $stmt->fetch()['count'];
 echo "📦 Produtos cadastrados: $productsCount\n";
 
-// Teste 4: Verificar extensões PHP
 echo "\n4. Verificando extensões PHP necessárias...\n";
 $extensions = ['pdo_sqlite', 'mbstring', 'json', 'openssl', 'curl'];
 foreach ($extensions as $ext) {
@@ -63,14 +53,12 @@ foreach ($extensions as $ext) {
     }
 }
 
-// Teste 5: Listar categorias
 echo "\n5. Listando categorias cadastradas...\n";
 $stmt = $pdo->query("SELECT * FROM categories");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     echo "📁 ID: {$row['id']} - Nome: {$row['nome']}\n";
 }
 
-// Teste 6: Verificar usuário de teste
 echo "\n6. Verificando usuário de teste...\n";
 $stmt = $pdo->query("SELECT * FROM users WHERE email = 'teste@exemplo.com'");
 if ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -79,17 +67,13 @@ if ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
     echo "❌ Usuário de teste não encontrado\n";
 }
 
-// Teste 7: Criar token de autenticação
 echo "\n7. Testando autenticação por token...\n";
 try {
-    // Buscar o usuário de teste
     $stmt = $pdo->query("SELECT * FROM users WHERE email = 'teste@exemplo.com'");
     if ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        // Criar um token de teste
         $tokenName = 'teste-token-' . date('Y-m-d-H-i-s');
         $token = bin2hex(random_bytes(40));
         
-        // Inserir token na tabela personal_access_tokens
         $stmt = $pdo->prepare("INSERT INTO personal_access_tokens (tokenable_type, tokenable_id, name, token, abilities, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $now = date('Y-m-d H:i:s');
         $stmt->execute([
@@ -104,15 +88,12 @@ try {
         
         echo "✅ Token criado: $token\n";
         
-        // Teste 8: Testar endpoints da API
         echo "\n8. Testando endpoints da API...\n";
         
-        // Verificar se cURL está disponível
         if (!extension_loaded('curl')) {
             echo "❌ Extensão cURL não está habilitada. Pulando testes de API.\n";
             echo "   Para habilitar cURL, descomente 'extension=curl' no php.ini\n";
         } else {
-            // Testar endpoint de categorias (público)
             $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:8000/api/categories');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -152,7 +133,6 @@ try {
             echo "   Resposta: $response\n";
         }
         
-        // Testar criação de produto
         $productData = [
             'nome' => 'Produto Teste',
             'descricao' => 'Descrição do produto de teste',
@@ -185,7 +165,7 @@ try {
             echo "   Resposta: $response\n";
         }
         
-        } // fim do if extension_loaded('curl')
+        }
         
     } else {
         echo "❌ Usuário de teste não encontrado para criar token\n";

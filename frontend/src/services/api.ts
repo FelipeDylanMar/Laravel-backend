@@ -41,12 +41,7 @@ class ApiService {
     return headers
   }
 
-  /**
-   * Handle API errors with proper typing and logging
-   * @param error - The error to handle
-   * @param response - The response object
-   * @param data - The response data
-   */
+  
   private handleError(error: unknown, response?: Response, data?: unknown): never {
     console.error('API Request Error:', {
       error,
@@ -78,10 +73,10 @@ class ApiService {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
     
-    // Merge headers properly
+  
     const headers = this.createHeaders(options.headers as Record<string, string>)
     
-    // Configure request with timeout and merged options
+  
     const config: RequestInit = {
       signal: AbortSignal.timeout(API_CONFIG.TIMEOUT),
       ...options,
@@ -91,7 +86,7 @@ class ApiService {
     try {
       const response = await fetch(url, config)
       
-      // Parse response based on content type
+    
       const contentType = response.headers.get('content-type')
       let data: unknown = null
       

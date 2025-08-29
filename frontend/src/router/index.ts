@@ -91,51 +91,51 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
   const aclStore = useAclStore()
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-  // Initialize auth if needed
+
   if (authStore.token && !authStore.user && requiresAuth) {
     await authStore.checkAuth()
   }
 
-  // Check authentication
+
   if (requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
     return
   }
 
-  // Redirect authenticated users away from login
+
   if (to.name === 'Login' && authStore.isAuthenticated) {
     const redirect = to.query.redirect as string
     next(redirect || '/products')
     return
   }
 
-  // Check ACL permissions if user is authenticated
+
   if (authStore.isAuthenticated && requiresAuth) {
-    // Initialize ACL if not already done
+
     if (!aclStore.isInitialized) {
       aclStore.initializeFromUser(authStore.user)
     }
 
-    // Get route meta for ACL checks
+
     const routeMeta = to.matched.find(record => record.meta.permissions || record.meta.role || record.meta.minRoleLevel)?.meta
 
     if (routeMeta) {
       let hasAccess = true
       let reason = ''
 
-      // Check role requirement
+  
       if (routeMeta.role && !aclStore.hasRole(routeMeta.role)) {
         hasAccess = false
         reason = `Papel necessário: ${routeMeta.role}`
       }
 
-      // Check minimum role level
+  
       if (routeMeta.minRoleLevel && !aclStore.hasRoleLevel(routeMeta.minRoleLevel)) {
         hasAccess = false
         reason = `Nível mínimo necessário: ${routeMeta.minRoleLevel}`
       }
 
-      // Check permissions (any)
+  
       if (routeMeta.permissions && routeMeta.permissions.length > 0) {
         const permissionCheck = aclStore.hasAnyPermission(routeMeta.permissions)
         if (!permissionCheck.granted) {
@@ -144,7 +144,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
         }
       }
 
-      // Check permissions (all required)
+  
       if (routeMeta.requireAllPermissions && routeMeta.requireAllPermissions.length > 0) {
         const permissionCheck = aclStore.hasAllPermissions(routeMeta.requireAllPermissions)
         if (!permissionCheck.granted) {
@@ -153,7 +153,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
         }
       }
 
-      // Redirect to unauthorized if no access
+  
       if (!hasAccess) {
         next({
           name: 'unauthorized',

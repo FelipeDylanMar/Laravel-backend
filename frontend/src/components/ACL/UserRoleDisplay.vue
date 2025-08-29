@@ -1,12 +1,10 @@
 <template>
   <div class="user-role-display" v-if="isInitialized">
-    <!-- Role Badge -->
     <div class="role-badge" :class="`role-${currentRole}`">
       <i class="role-icon" :class="roleIcon"></i>
       <span class="role-name">{{ roleDisplayName }}</span>
     </div>
     
-    <!-- Permissions List (if showPermissions is true) -->
     <div v-if="showPermissions && currentPermissions.length > 0" class="permissions-list">
       <h4 class="permissions-title">Permissões:</h4>
       <div class="permissions-grid">
@@ -20,14 +18,12 @@
       </div>
     </div>
     
-    <!-- Role Level (if showLevel is true) -->
     <div v-if="showLevel" class="role-level">
       <span class="level-label">Nível:</span>
       <span class="level-value">{{ currentRoleLevel }}</span>
     </div>
   </div>
   
-  <!-- Loading state -->
   <div v-else class="user-role-loading">
     <i class="loading-icon">⏳</i>
     <span>Carregando permissões...</span>
@@ -39,17 +35,10 @@ import { computed } from 'vue'
 import { usePermissions } from '@/composables/usePermissions'
 import type { UserRole } from '@/types'
 
-/**
- * UserRoleDisplay Component
- * Displays current user's role, permissions, and access level
- */
 
 interface Props {
-  /** Show user permissions list */
   showPermissions?: boolean
-  /** Show role level */
   showLevel?: boolean
-  /** Compact display mode */
   compact?: boolean
 }
 
@@ -66,9 +55,7 @@ const {
   isInitialized
 } = usePermissions()
 
-/**
- * Get display name for current role
- */
+
 const roleDisplayName = computed(() => {
   const roleNames: Record<UserRole, string> = {
     admin: 'Administrador',
@@ -80,9 +67,7 @@ const roleDisplayName = computed(() => {
   return currentRole.value ? roleNames[currentRole.value] || currentRole.value : 'Não definido'
 })
 
-/**
- * Get icon for current role
- */
+
 const roleIcon = computed(() => {
   const roleIcons: Record<UserRole, string> = {
     admin: '👑',
@@ -94,11 +79,9 @@ const roleIcon = computed(() => {
   return currentRole.value ? roleIcons[currentRole.value] || '❓' : '❓'
 })
 
-/**
- * Format permission name for display
- */
+
 function formatPermission(permission: string): string {
-  // Convert 'products.view' to 'Produtos - Visualizar'
+  
   const [resource, action] = permission.split('.')
   
   const resourceNames: Record<string, string> = {

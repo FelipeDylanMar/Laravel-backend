@@ -16,39 +16,32 @@ class ACLSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Permissions
         $permissions = [
-            // User Management
             ['name' => 'users.view', 'description' => 'View users', 'category' => 'User Management'],
             ['name' => 'users.create', 'description' => 'Create users', 'category' => 'User Management'],
             ['name' => 'users.edit', 'description' => 'Edit users', 'category' => 'User Management'],
             ['name' => 'users.delete', 'description' => 'Delete users', 'category' => 'User Management'],
             
-            // Role Management
             ['name' => 'roles.view', 'description' => 'View roles', 'category' => 'Role Management'],
             ['name' => 'roles.create', 'description' => 'Create roles', 'category' => 'Role Management'],
             ['name' => 'roles.edit', 'description' => 'Edit roles', 'category' => 'Role Management'],
             ['name' => 'roles.delete', 'description' => 'Delete roles', 'category' => 'Role Management'],
             
-            // Permission Management
             ['name' => 'permissions.view', 'description' => 'View permissions', 'category' => 'Permission Management'],
             ['name' => 'permissions.create', 'description' => 'Create permissions', 'category' => 'Permission Management'],
             ['name' => 'permissions.edit', 'description' => 'Edit permissions', 'category' => 'Permission Management'],
             ['name' => 'permissions.delete', 'description' => 'Delete permissions', 'category' => 'Permission Management'],
             
-            // Product Management
             ['name' => 'products.view', 'description' => 'View products', 'category' => 'Product Management'],
             ['name' => 'products.create', 'description' => 'Create products', 'category' => 'Product Management'],
             ['name' => 'products.edit', 'description' => 'Edit products', 'category' => 'Product Management'],
             ['name' => 'products.delete', 'description' => 'Delete products', 'category' => 'Product Management'],
             
-            // Category Management
             ['name' => 'categories.view', 'description' => 'View categories', 'category' => 'Category Management'],
             ['name' => 'categories.create', 'description' => 'Create categories', 'category' => 'Category Management'],
             ['name' => 'categories.edit', 'description' => 'Edit categories', 'category' => 'Category Management'],
             ['name' => 'categories.delete', 'description' => 'Delete categories', 'category' => 'Category Management'],
             
-            // System
             ['name' => 'system.settings', 'description' => 'Access system settings', 'category' => 'System'],
             ['name' => 'system.logs', 'description' => 'View system logs', 'category' => 'System'],
         ];
@@ -60,7 +53,6 @@ class ACLSeeder extends Seeder
             );
         }
         
-        // Create Roles
         $adminRole = Role::firstOrCreate(
             ['name' => 'Admin'],
             [
@@ -88,23 +80,18 @@ class ACLSeeder extends Seeder
             ]
         );
         
-        // Assign permissions to roles
         $allPermissions = Permission::all();
         
-        // Admin gets all permissions
         $adminRole->permissions()->sync($allPermissions->pluck('id'));
         
-        // Manager gets most permissions except system and user management
         $managerPermissions = $allPermissions->whereNotIn('category', ['System', 'User Management', 'Role Management', 'Permission Management']);
         $managerRole->permissions()->sync($managerPermissions->pluck('id'));
         
-        // User gets only view permissions
         $userPermissions = $allPermissions->filter(function($permission) {
             return str_ends_with($permission->name, '.view');
         });
         $userRole->permissions()->sync($userPermissions->pluck('id'));
         
-        // Create admin user if not exists
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
@@ -115,7 +102,6 @@ class ACLSeeder extends Seeder
             ]
         );
         
-        // Create manager user if not exists
         $managerUser = User::firstOrCreate(
             ['email' => 'manager@example.com'],
             [
@@ -126,7 +112,6 @@ class ACLSeeder extends Seeder
             ]
         );
         
-        // Create regular user if not exists
         $regularUser = User::firstOrCreate(
             ['email' => 'user@example.com'],
             [

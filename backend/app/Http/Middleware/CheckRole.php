@@ -9,13 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  $role
-     * @param  string  $type (optional: 'any' or 'level')
-     */
+   
     public function handle(Request $request, Closure $next, string $role, string $type = 'single'): Response
     {
         $user = $request->user();
@@ -24,7 +18,6 @@ class CheckRole
             return $this->unauthorizedResponse('User not authenticated');
         }
 
-        // Load role relationship if not already loaded
         if (!$user->relationLoaded('role')) {
             $user->load('role');
         }

@@ -10,19 +10,15 @@ use Illuminate\Validation\Rule;
 
 class PermissionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+   
     public function index(Request $request): JsonResponse
     {
         $query = Permission::query();
         
-        // Filter by category if provided
         if ($request->has('category')) {
             $query->byCategory($request->category);
         }
         
-        // Filter by active status if provided
         if ($request->has('active')) {
             if ($request->boolean('active')) {
                 $query->active();
@@ -39,9 +35,7 @@ class PermissionController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -60,9 +54,7 @@ class PermissionController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id): JsonResponse
     {
         $permission = Permission::findOrFail($id);
@@ -73,9 +65,7 @@ class PermissionController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id): JsonResponse
     {
         $permission = Permission::findOrFail($id);
@@ -96,14 +86,11 @@ class PermissionController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id): JsonResponse
     {
         $permission = Permission::findOrFail($id);
         
-        // Check if permission is assigned to any roles
         if ($permission->roles()->count() > 0) {
             return response()->json([
                 'success' => false,
@@ -119,9 +106,7 @@ class PermissionController extends Controller
         ]);
     }
     
-    /**
-     * Get permissions grouped by category.
-     */
+    
     public function getByCategory(): JsonResponse
     {
         $permissions = Permission::active()->get()->groupBy('category');
@@ -132,9 +117,7 @@ class PermissionController extends Controller
         ]);
     }
     
-    /**
-     * Get all available categories.
-     */
+    
     public function getCategories(): JsonResponse
     {
         $categories = Permission::whereNotNull('category')

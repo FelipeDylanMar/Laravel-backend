@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Paleta de cores INNYX
+  
         'innyx': {
           'primary': {
             50: '#faf5ff',
@@ -15,7 +15,7 @@ export default {
             200: '#e9d5ff',
             300: '#d8b4fe',
             400: '#c084fc',
-            500: '#a855f7', // Roxo principal INNYX
+            500: '#a855f7',
             600: '#9333ea',
             700: '#7c3aed',
             800: '#6b21a8',
@@ -28,7 +28,7 @@ export default {
             200: '#fed7aa',
             300: '#fdba74',
             400: '#fb923c',
-            500: '#f97316', // Laranja principal INNYX
+            500: '#f97316',
             600: '#ea580c',
             700: '#c2410c',
             800: '#9a3412',
@@ -41,7 +41,7 @@ export default {
             200: '#bae6fd',
             300: '#7dd3fc',
             400: '#38bdf8',
-            500: '#0ea5e9', // Azul claro para acentos
+            500: '#0ea5e9',
             600: '#0284c7',
             700: '#0369a1',
             800: '#075985',

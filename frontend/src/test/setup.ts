@@ -1,9 +1,9 @@
 import { vi } from 'vitest'
 
-// Mock do fetch global
+
 global.fetch = vi.fn()
 
-// Mock do localStorage
+
 Object.defineProperty(window, 'localStorage', {
   value: {
     getItem: vi.fn(),
@@ -14,7 +14,7 @@ Object.defineProperty(window, 'localStorage', {
   writable: true,
 })
 
-// Mock do sessionStorage
+
 Object.defineProperty(window, 'sessionStorage', {
   value: {
     getItem: vi.fn(),

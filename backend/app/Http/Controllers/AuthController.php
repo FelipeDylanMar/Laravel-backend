@@ -29,7 +29,6 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        // Prepare user data with role and permissions
         $userData = $user->toArray();
         $userData['role'] = $user->role?->name;
         $userData['permissions'] = $user->role?->permissions->pluck('name')->toArray() ?? [];
@@ -60,7 +59,6 @@ class AuthController extends Controller
     {
         $user = $request->user()->load('role.permissions');
         
-        // Prepare user data with role and permissions
         $userData = $user->toArray();
         $userData['role'] = $user->role?->name;
         $userData['permissions'] = $user->role?->permissions->pluck('name')->toArray() ?? [];

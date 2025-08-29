@@ -9,13 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckPermission
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  $permission
-     * @param  string  $type (optional: 'any' or 'all')
-     */
+   
     public function handle(Request $request, Closure $next, string $permission, string $type = 'single'): Response
     {
         $user = $request->user();
@@ -24,7 +18,6 @@ class CheckPermission
             return $this->unauthorizedResponse('User not authenticated');
         }
 
-        // Load role relationship if not already loaded
         if (!$user->relationLoaded('role')) {
             $user->load('role.permissions');
         }
@@ -52,9 +45,6 @@ class CheckPermission
         return $next($request);
     }
 
-    /**
-     * Return unauthorized response.
-     */
     private function unauthorizedResponse(string $message): JsonResponse
     {
         return response()->json([

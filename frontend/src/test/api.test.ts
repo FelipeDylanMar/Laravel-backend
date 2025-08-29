@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock global fetch
+
 const mockFetch = vi.fn()
 global.fetch = mockFetch
 

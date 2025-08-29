@@ -47,7 +47,7 @@ describe('Utility Functions Tests', () => {
         return date.toLocaleDateString('pt-BR')
       }
       
-      const testDate = new Date(2025, 0, 15) // Year, Month (0-indexed), Day
+      const testDate = new Date(2025, 0, 15)
       expect(formatDate(testDate)).toBe('15/01/2025')
     })
 

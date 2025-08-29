@@ -12,14 +12,11 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+   
     public function index(Request $request): JsonResponse
     {
         $query = User::with('role');
         
-        // Filter by role if provided
         if ($request->has('role_id')) {
             $query->where('role_id', $request->role_id);
         }
@@ -32,9 +29,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+   
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -56,9 +51,7 @@ class UserController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id): JsonResponse
     {
         $user = User::with('role')->findOrFail($id);
@@ -69,9 +62,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, string $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -99,9 +90,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+   
     public function destroy(string $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -113,9 +102,7 @@ class UserController extends Controller
         ]);
     }
     
-    /**
-     * Assign role to user.
-     */
+    
     public function assignRole(Request $request, string $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -134,9 +121,6 @@ class UserController extends Controller
         ]);
     }
     
-    /**
-     * Remove role from user.
-     */
     public function removeRole(string $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -151,9 +135,6 @@ class UserController extends Controller
         ]);
     }
     
-    /**
-     * Get user permissions.
-     */
     public function getPermissions(string $id): JsonResponse
     {
         $user = User::findOrFail($id);
