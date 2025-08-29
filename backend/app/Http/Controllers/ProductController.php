@@ -80,7 +80,7 @@ class ProductController extends Controller
     {
         $product = Product::with('category')->findOrFail($id);
         $product->image_url = $product->imagem ? url('images/' . $product->imagem) : null;
-        return response()->json($product);
+        return response()->json(['data' => $product]);
     }
 
     public function update(Request $request, string $id): JsonResponse
