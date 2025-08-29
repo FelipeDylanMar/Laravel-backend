@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 // @ts-ignore
 import vue from '@vitejs/plugin-vue'
@@ -24,8 +23,6 @@ export default defineConfig({
   },
   esbuild: {
     target: 'es2020'
-  },
-  optimizeDeps: {
-    include: ['vue', 'vue-router', 'pinia']
   }
+  
 })

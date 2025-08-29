@@ -229,13 +229,7 @@
             >
               Cancelar
             </router-link>
-            <button
-              type="button"
-              @click="testPayload"
-              class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Teste Payload
-            </button>
+
             <button
               type="submit"
               :disabled="submitting"

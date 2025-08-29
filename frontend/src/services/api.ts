@@ -25,6 +25,8 @@ class ApiService {
         'Accept': 'application/json',
         ...options.headers
       },
+      // Timeout de 10 segundos para evitar travamentos
+      signal: AbortSignal.timeout(10000),
       ...options
     }
 

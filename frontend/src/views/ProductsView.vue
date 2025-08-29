@@ -240,7 +240,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
-import { useAuthStore } from '@/stores/auth'
 import type { Filters } from '@/types'
 
 declare global {
@@ -251,7 +250,6 @@ declare global {
 
 const router = useRouter()
 const productsStore = useProductsStore()
-const authStore = useAuthStore()
 
 const searchQuery = ref('')
 const sortBy = ref('name')

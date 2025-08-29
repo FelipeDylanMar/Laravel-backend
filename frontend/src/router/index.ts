@@ -66,7 +66,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
   const authStore = useAuthStore()
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-  if (authStore.token && !authStore.user) {
+  // Só verifica auth se necessário e ainda não foi verificado
+  if (authStore.token && !authStore.user && requiresAuth) {
     await authStore.checkAuth()
   }
 

@@ -272,7 +272,7 @@ const fetchProduct = async () => {
   }
 }
 
-const handleMainImageError = (event: Event) => {
+const handleMainImageError = () => {
   imageError.value = true
   imageLoaded.value = false
 }
