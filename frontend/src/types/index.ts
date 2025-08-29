@@ -80,6 +80,8 @@ export interface ProductFormData {
   category_id: number | string
   /** Product image file for upload */
   image?: File | null
+  /** Product stock quantity */
+  stock?: number | string
   
   // Portuguese field names (required for backend)
   /** Product name (Portuguese) - required */
@@ -90,6 +92,8 @@ export interface ProductFormData {
   preco: number | string
   /** Expiration date (Portuguese) - required */
   data_validade: string
+  /** Product stock (Portuguese) */
+  estoque?: number | string
 }
 
 // ============================================================================
@@ -174,6 +178,8 @@ export interface LoginCredentials {
   email: string
   /** User's password */
   password: string
+  /** Index signature for API compatibility */
+  [key: string]: string
 }
 
 /**
@@ -189,6 +195,8 @@ export interface RegisterData {
   password: string
   /** Password confirmation for validation */
   password_confirmation: string
+  /** Index signature for API compatibility */
+  [key: string]: string
 }
 
 // ============================================================================
@@ -371,13 +379,17 @@ export interface PasswordUpdateData {
   password: string
   /** New password confirmation */
   password_confirmation: string
+  /** Index signature for API compatibility */
+  [key: string]: string
 }
 
 /**
  * Password reset request interface
- * Used for initiating password reset flow
+ * Used for requesting password reset emails
  */
 export interface PasswordResetRequest {
   /** User's email address */
   email: string
+  /** Index signature for API compatibility */
+  [key: string]: string
 }

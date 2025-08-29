@@ -1,9 +1,5 @@
-import type { ErrorResponse, ApiError, RequestConfig } from '@/types'
+import type { ErrorResponse, ApiError } from '@/types'
 
-/**
- * API Configuration
- * Supports environment-based URL configuration
- */
 const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api',
   TIMEOUT: 10000,
@@ -11,9 +7,6 @@ const API_CONFIG = {
   RETRY_DELAY: 1000
 } as const
 
-/**
- * HTTP status codes for better error handling
- */
 const HTTP_STATUS = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
@@ -21,31 +14,18 @@ const HTTP_STATUS = {
   UNPROCESSABLE_ENTITY: 422,
   INTERNAL_SERVER_ERROR: 500
 } as const
-/**
- * API Service class for handling HTTP requests
- * Provides a centralized way to interact with the backend API
- */
+
 class ApiService {
   private baseURL: string
-  private retryCount: number = 0
 
   constructor() {
     this.baseURL = API_CONFIG.BASE_URL
   }
 
-  /**
-   * Get authentication token from localStorage
-   * @returns Authentication token or null
-   */
   private getAuthToken(): string | null {
     return localStorage.getItem('token')
   }
 
-  /**
-   * Create request headers with authentication
-   * @param customHeaders - Additional headers to include
-   * @returns Complete headers object
-   */
   private createHeaders(customHeaders: Record<string, string> = {}): Record<string, string> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -76,7 +56,6 @@ class ApiService {
     })
 
     if (response?.status === HTTP_STATUS.UNAUTHORIZED) {
-      // Clear invalid token and redirect to login
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login'
@@ -88,21 +67,10 @@ class ApiService {
     throw apiError
   }
 
-  /**
-   * Sleep function for retry delays
-   * @param ms - Milliseconds to sleep
-   */
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  /**
-   * Main HTTP request method with retry logic and proper error handling
-   * @param endpoint - API endpoint to call
-   * @param options - Request options
-   * @param retryCount - Current retry attempt (internal use)
-   * @returns Promise with typed response data
-   */
   async request<T = unknown>(
     endpoint: string, 
     options: RequestInit = {}, 
@@ -159,12 +127,6 @@ class ApiService {
     }
   }
 
-  /**
-   * HTTP GET request with query parameters
-   * @param endpoint - API endpoint
-   * @param params - Query parameters
-   * @returns Promise with typed response data
-   */
   async get<T = unknown>(
     endpoint: string, 
     params: Record<string, string | number | boolean> = {}
@@ -182,18 +144,12 @@ class ApiService {
     return this.request<T>(url, { method: 'GET' })
   }
 
-  /**
-   * HTTP POST request
-   * @param endpoint - API endpoint
-   * @param data - Request body data
-   * @returns Promise with typed response data
-   */
   async post<T = unknown>(
     endpoint: string, 
     data: Record<string, unknown> | FormData = {}
   ): Promise<T> {
     const isFormData = data instanceof FormData
-    const headers = isFormData ? {} : undefined // Let browser set Content-Type for FormData
+    const headers = isFormData ? {} : undefined
     
     return this.request<T>(endpoint, {
       method: 'POST',
@@ -202,12 +158,6 @@ class ApiService {
     })
   }
 
-  /**
-   * HTTP PUT request
-   * @param endpoint - API endpoint
-   * @param data - Request body data
-   * @returns Promise with typed response data
-   */
   async put<T = unknown>(
     endpoint: string, 
     data: Record<string, unknown> | FormData = {}
@@ -222,12 +172,6 @@ class ApiService {
     })
   }
 
-  /**
-   * HTTP PATCH request
-   * @param endpoint - API endpoint
-   * @param data - Request body data
-   * @returns Promise with typed response data
-   */
   async patch<T = unknown>(
     endpoint: string, 
     data: Record<string, unknown> | FormData = {}
@@ -242,24 +186,12 @@ class ApiService {
     })
   }
 
-  /**
-   * HTTP DELETE request
-   * @param endpoint - API endpoint
-   * @returns Promise with typed response data
-   */
   async delete<T = unknown>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'DELETE'
     })
   }
 
-  /**
-   * Upload file with additional data
-   * @param endpoint - API endpoint for file upload
-   * @param file - File to upload
-   * @param additionalData - Additional form data
-   * @returns Promise with typed response data
-   */
   async upload<T = unknown>(
     endpoint: string, 
     file: File, 
@@ -268,7 +200,6 @@ class ApiService {
     const formData = new FormData()
     formData.append('file', file)
     
-    // Add additional data to FormData
     Object.entries(additionalData).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         formData.append(key, value)
@@ -278,25 +209,13 @@ class ApiService {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: formData,
-      headers: {} // Let browser set Content-Type for FormData
+      headers: {}
     })
   }
 }
 
-/**
- * Singleton instance of ApiService
- * Provides a centralized HTTP client for the application
- */
 const apiService = new ApiService()
 
-/**
- * Exported HTTP methods for convenient usage throughout the application
- * These methods are bound to the singleton instance
- */
 export const { get, post, put, patch, delete: del, upload } = apiService
 
-/**
- * Default export of the ApiService singleton instance
- * Use this for accessing the full API service functionality
- */
 export default apiService

@@ -57,7 +57,6 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  // @ts-ignore
   history: createWebHistory(import.meta.env.BASE_URL || '/'),
   routes
 })
@@ -66,7 +65,6 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
   const authStore = useAuthStore()
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-  // Só verifica auth se necessário e ainda não foi verificado
   if (authStore.token && !authStore.user && requiresAuth) {
     await authStore.checkAuth()
   }

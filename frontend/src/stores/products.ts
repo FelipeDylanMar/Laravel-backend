@@ -18,7 +18,6 @@ interface Filters {
 }
 
 export const useProductsStore = defineStore('products', () => {
-  // Estado
   const products: Ref<Product[]> = ref([])
   const currentProduct: Ref<Product | null> = ref(null)
   const categories: Ref<Category[]> = ref([])
@@ -37,13 +36,10 @@ export const useProductsStore = defineStore('products', () => {
     sort_order: 'asc'
   })
 
-  // Getters
   const totalProducts: ComputedRef<number> = computed(() => pagination.value.total)
   const hasProducts: ComputedRef<boolean> = computed(() => products.value.length > 0)
   const currentPage: ComputedRef<number> = computed(() => pagination.value.current_page)
   const totalPages: ComputedRef<number> = computed(() => pagination.value.last_page)
-
-  // Actions
   const fetchProducts = async (page: number = 1, customFilters: Partial<Filters> = {}): Promise<PaginatedResponse<Product>> => {
     isLoading.value = true
     error.value = null
@@ -57,10 +53,8 @@ export const useProductsStore = defineStore('products', () => {
         per_page: 10
       }
       
-      // Adicionar filtros customizados
       Object.assign(params, customFilters)
       
-      // Adicionar categoria apenas se não for null
       if (filters.value.category !== null) {
         params.category = filters.value.category
       }
@@ -69,7 +63,6 @@ export const useProductsStore = defineStore('products', () => {
       
       products.value = response.data || []
       
-      // Atualizar informações de paginação
       pagination.value = {
         current_page: response.current_page,
         last_page: response.last_page,
@@ -110,9 +103,8 @@ export const useProductsStore = defineStore('products', () => {
     error.value = null
     
     try {
-      const response = await productService.createProduct(productData)
+      const newProduct = await productService.createProduct(productData)
       
-      const newProduct = response.data
       products.value.unshift(newProduct)
       
       return newProduct
@@ -130,16 +122,13 @@ export const useProductsStore = defineStore('products', () => {
     error.value = null
     
     try {
-      const response = await productService.updateProduct(id, productData)
-      const updatedProduct = response.data
+      const updatedProduct = await productService.updateProduct(id, productData)
       
-      // Atualizar produto na lista
       const index = products.value.findIndex(p => p.id == id)
       if (index !== -1) {
         products.value[index] = updatedProduct
       }
       
-      // Atualizar produto atual se for o mesmo
       if (currentProduct.value && currentProduct.value.id == id) {
         currentProduct.value = updatedProduct
       }
@@ -161,10 +150,8 @@ export const useProductsStore = defineStore('products', () => {
     try {
       await productService.deleteProduct(id)
       
-      // Remover produto da lista
       products.value = products.value.filter(p => p.id != id)
       
-      // Limpar produto atual se for o mesmo
       if (currentProduct.value && currentProduct.value.id == id) {
         currentProduct.value = null
       }
@@ -225,7 +212,6 @@ export const useProductsStore = defineStore('products', () => {
   }
 
   return {
-    // Estado
     products,
     currentProduct,
     categories,
@@ -233,12 +219,10 @@ export const useProductsStore = defineStore('products', () => {
     error,
     pagination,
     filters,
-    // Getters
     totalProducts,
     hasProducts,
     currentPage,
     totalPages,
-    // Actions
     fetchProducts,
     fetchProduct,
     createProduct,
