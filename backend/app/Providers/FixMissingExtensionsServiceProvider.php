@@ -11,7 +11,7 @@ class FixMissingExtensionsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Criar função mb_split no namespace global se não existir
+
         if (!function_exists('mb_split')) {
             eval('
                 function mb_split($pattern, $string, $limit = -1) {
@@ -20,7 +20,7 @@ class FixMissingExtensionsServiceProvider extends ServiceProvider
             ');
         }
         
-        // Criar função mb_split no namespace Illuminate\Support se não existir
+
         if (!function_exists('Illuminate\\Support\\mb_split')) {
             eval('
                 namespace Illuminate\\Support;
@@ -38,6 +38,6 @@ class FixMissingExtensionsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+
     }
 }

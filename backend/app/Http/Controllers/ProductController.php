@@ -14,7 +14,7 @@ class ProductController extends Controller
     {
         $query = Product::with('category');
         
-        // Verificar se há parâmetro de busca
+
         if ($request->has('search') && !empty($request->get('search'))) {
             $search = $request->get('search');
             $query->where(function($q) use ($search) {
@@ -23,12 +23,12 @@ class ProductController extends Controller
             });
         }
         
-        // Aplicar ordenação se especificada
+
         if ($request->has('sort_by')) {
             $sortBy = $request->get('sort_by');
             $sortOrder = $request->get('sort_order', 'asc');
             
-            // Mapear campos do frontend para o backend
+
             $fieldMap = [
                 'name' => 'nome',
                 'price' => 'preco',
@@ -43,7 +43,7 @@ class ProductController extends Controller
         
         $products = $query->paginate(10);
         
-        // Adicionar image_url manualmente para cada produto
+
         $products->getCollection()->transform(function ($product) {
             $product->image_url = $product->imagem ? url('images/' . $product->imagem) : null;
             return $product;

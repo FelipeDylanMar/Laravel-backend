@@ -21,7 +21,7 @@ class Product extends Model
         'data_validade' => 'date'
     ];
 
-    // protected $appends = ['image_url'];
+
 
     public function category(): BelongsTo
     {
