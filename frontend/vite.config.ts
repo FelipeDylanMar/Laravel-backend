@@ -1,0 +1,31 @@
+import { fileURLToPath, URL } from 'node:url'
+
+import { defineConfig } from 'vite'
+// @ts-ignore
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    vue({
+      script: {
+        defineModel: true,
+        propsDestructure: true
+      }
+    }),
+    vueDevTools(),
+  ],
+  resolve: {
+    alias: {
+      // @ts-ignore
+      '@': fileURLToPath(new URL('./src', import.meta.url ))
+    },
+  },
+  esbuild: {
+    target: 'es2020'
+  },
+  optimizeDeps: {
+    include: ['vue', 'vue-router', 'pinia']
+  }
+})
