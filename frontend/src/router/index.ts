@@ -7,7 +7,6 @@ declare module 'vue-router' {
   }
 }
 
-// Lazy loading das views
 const Home = () => import('@/views/HomeView.vue')
 const Login = () => import('@/views/LoginView.vue')
 const Products = () => import('@/views/ProductsView.vue')
@@ -63,12 +62,10 @@ const router = createRouter({
   routes
 })
 
-// Guard de autenticação
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext): Promise<void> => {
   const authStore = useAuthStore()
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-  // Verificar autenticação se houver token
   if (authStore.token && !authStore.user) {
     await authStore.checkAuth()
   }

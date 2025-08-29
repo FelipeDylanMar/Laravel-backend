@@ -7,9 +7,7 @@ export interface LoginResponse {
   message: string
 }
 
-// Serviço de autenticação
 class AuthService {
-  // Login do usuário
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
       const data = credentials as unknown as Record<string, unknown>
@@ -21,17 +19,14 @@ class AuthService {
     }
   }
 
-  // Logout do usuário
   async logout(): Promise<void> {
     try {
       await apiService.post('/logout')
     } catch (error: unknown) {
-      // Mesmo se der erro na API, vamos limpar o token local
       console.warn('Erro ao fazer logout na API:', error)
     }
   }
 
-  // Obter dados do usuário autenticado
   async getUser(): Promise<User> {
     try {
       const response = await apiService.get<User>('/user')
@@ -42,7 +37,6 @@ class AuthService {
     }
   }
 
-  // Registrar novo usuário
   async register(userData: RegisterData): Promise<LoginResponse> {
     try {
       const data = userData as unknown as Record<string, unknown>

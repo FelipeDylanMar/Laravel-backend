@@ -14,14 +14,9 @@ class ProductService {
     }
   }
 
-  // Obter um produto específico
   async getProduct(id: number | string): Promise<ApiResponse<Product>> {
-    console.log('ProductService - getProduct chamado com ID:', id)
-    console.log('ProductService - URL será:', `/products/${id}`)
-    
     try {
       const response = await apiService.get<ApiResponse<Product>>(`/products/${id}`)
-      console.log('ProductService - Resposta da API:', response)
       return response
     } catch (error: unknown) {
       console.error('ProductService - Erro na requisição:', error)
@@ -30,7 +25,7 @@ class ProductService {
     }
   }
 
-  // Criar novo produto
+
   async createProduct(productData: FormData | ProductFormData): Promise<ApiResponse<Product>> {
     try {
       // Se productData é FormData, usar upload, senão usar post normal
@@ -71,7 +66,7 @@ class ProductService {
     }
   }
 
-  // Upload de imagem do produto
+
   async uploadProductImage(id: number | string, imageFile: File): Promise<ApiResponse<Product>> {
     try {
       const formData = new FormData()
@@ -133,7 +128,7 @@ class ProductService {
     }
   }
 
-  // Validar dados do produto antes de enviar
+
   validateProduct(productData: Partial<ProductFormData>): { isValid: boolean; errors: string[] } {
     const errors: string[] = []
 

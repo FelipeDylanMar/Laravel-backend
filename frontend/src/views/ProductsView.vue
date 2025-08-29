@@ -243,7 +243,6 @@ import { useProductsStore } from '@/stores/products'
 import { useAuthStore } from '@/stores/auth'
 import type { Filters } from '@/types'
 
-// Extend Window interface for searchTimeout
 declare global {
   interface Window {
     searchTimeout?: ReturnType<typeof setTimeout>
@@ -254,12 +253,10 @@ const router = useRouter()
 const productsStore = useProductsStore()
 const authStore = useAuthStore()
 
-// State
 const searchQuery = ref('')
 const sortBy = ref('name')
 const sortOrder = ref('asc')
 
-// Computed properties from store
 const products = computed(() => productsStore.products)
 const loading = computed(() => productsStore.isLoading)
 const error = computed(() => productsStore.error)
@@ -267,8 +264,6 @@ const currentPage = computed(() => productsStore.currentPage)
 const totalPages = computed(() => productsStore.totalPages)
 const total = computed(() => productsStore.totalProducts)
 const perPage = computed(() => productsStore.pagination.per_page)
-
-// Computed
 const visiblePages = computed(() => {
   const pages = []
   const start = Math.max(1, currentPage.value - 2)
@@ -281,7 +276,6 @@ const visiblePages = computed(() => {
   return pages
 })
 
-// Methods
 const fetchProducts = async (page = currentPage.value) => {
   try {
     const filters: Partial<Filters> = {
@@ -289,7 +283,6 @@ const fetchProducts = async (page = currentPage.value) => {
       sort_by: sortBy.value,
       sort_order: sortOrder.value as 'asc' | 'desc'
     }
-    console.log('ProductsView - Enviando filtros:', filters)
     await productsStore.fetchProducts(page, filters)
   } catch (err) {
     console.error('Erro ao carregar produtos:', err)
@@ -332,7 +325,6 @@ const deleteProduct = async (id: string | number) => {
   
   try {
     await productsStore.deleteProduct(id)
-    // Recarregar a página atual após exclusão
     await fetchProducts()
   } catch (err) {
     console.error('Erro ao excluir produto:', err)
@@ -351,22 +343,14 @@ const formatPrice = (price: string | number) => {
 }
 
 const handleAddProduct = () => {
-  console.log('Botão Adicionar Produto clicado')
-  console.log('Estado de autenticação:', authStore.isAuthenticated)
-  console.log('Token:', authStore.token)
-  console.log('Usuário:', authStore.user)
-  console.log('Tentando navegar para /products/new')
   router.push('/products/new')
 }
 
-// Lifecycle
 onMounted(() => {
   fetchProducts()
 })
 
-// Watchers
 watch(searchQuery, () => {
-  // Debounce search
   clearTimeout(window.searchTimeout)
   window.searchTimeout = setTimeout(() => {
     handleSearch()

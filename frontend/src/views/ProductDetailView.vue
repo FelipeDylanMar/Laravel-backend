@@ -222,12 +222,8 @@ const router = useRouter()
 const productsStore = useProductsStore()
 const authStore = useAuthStore()
 
-// State
-
 const imageError = ref(false)
 const imageLoaded = ref(false)
-
-// Computed
 const productId = computed(() => route.params.id as string)
 const product = computed(() => productsStore.currentProduct)
 const loading = computed(() => productsStore.isLoading)
@@ -266,16 +262,9 @@ const selectedImage = computed(() => {
   return productImages.value[0] || null
 })
 
-// Methods
 const fetchProduct = async () => {
-  console.log('ProductDetailView - Iniciando fetchProduct')
-  console.log('ProductDetailView - Product ID:', productId.value)
-  console.log('ProductDetailView - Token:', localStorage.getItem('token'))
-  
   try {
     await productsStore.fetchProduct(productId.value as string)
-    console.log('ProductDetailView - Produto carregado:', productsStore.currentProduct)
-    // Reset image states when loading new product
     imageError.value = false
     imageLoaded.value = false
   } catch (err) {
@@ -284,8 +273,6 @@ const fetchProduct = async () => {
 }
 
 const handleMainImageError = (event: Event) => {
-  const target = event.target as HTMLImageElement
-  console.warn('Erro ao carregar imagem principal:', target.src)
   imageError.value = true
   imageLoaded.value = false
 }
@@ -297,7 +284,6 @@ const deleteProduct = async () => {
   
   try {
     await productsStore.deleteProduct(productId.value as string)
-    // Redirecionar para lista de produtos
     router.push('/products')
   } catch (err) {
     console.error('Erro ao excluir produto:', err)
@@ -325,7 +311,6 @@ const formatDate = (dateString: string | null | undefined) => {
 }
 
 const getCategoryName = (categoryId: number | string | null | undefined) => {
-  // Mapeamento básico de categorias
   const categoryMap: Record<number, string> = {
     1: 'Eletrônicos',
     2: 'Roupas',
@@ -348,20 +333,12 @@ const getCategoryName = (categoryId: number | string | null | undefined) => {
 
 
 
-// Lifecycle
 onMounted(async () => {
-  console.log('ProductDetailView - onMounted iniciado')
-  console.log('ProductDetailView - Token no localStorage:', localStorage.getItem('token'))
-  console.log('ProductDetailView - isAuthenticated:', authStore.isAuthenticated)
-  
-  // Verificar autenticação primeiro
   if (!authStore.isAuthenticated) {
-    console.log('ProductDetailView - Usuário não autenticado, redirecionando para login')
     router.push('/login')
     return
   }
   
-  // Clear any previous product data
   productsStore.clearCurrentProduct()
   productsStore.clearError()
   

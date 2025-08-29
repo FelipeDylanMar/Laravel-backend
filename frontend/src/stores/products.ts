@@ -88,16 +88,12 @@ export const useProductsStore = defineStore('products', () => {
   }
 
   const fetchProduct = async (id: number | string): Promise<Product> => {
-    console.log('ProductsStore - fetchProduct iniciado para ID:', id)
     isLoading.value = true
     error.value = null
     
     try {
-      console.log('ProductsStore - Chamando productService.getProduct')
       const response = await productService.getProduct(id)
-      console.log('ProductsStore - Resposta recebida:', response)
       currentProduct.value = response.data
-      console.log('ProductsStore - currentProduct.value definido:', currentProduct.value)
       return currentProduct.value
     } catch (err) {
       console.error('ProductsStore - Erro capturado:', err)
@@ -106,7 +102,6 @@ export const useProductsStore = defineStore('products', () => {
       throw err
     } finally {
       isLoading.value = false
-      console.log('ProductsStore - isLoading definido como false')
     }
   }
 
@@ -117,7 +112,6 @@ export const useProductsStore = defineStore('products', () => {
     try {
       const response = await productService.createProduct(productData)
       
-      // Adicionar o novo produto à lista
       const newProduct = response.data
       products.value.unshift(newProduct)
       

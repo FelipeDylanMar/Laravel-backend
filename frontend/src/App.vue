@@ -10,13 +10,11 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const logout = async () => {
   await authStore.logout()
-  // Forçar redirecionamento para login e atualizar a página
   router.push('/login').then(() => {
     window.location.reload()
   })
 }
 
-// Verificar autenticação ao carregar a aplicação
 onMounted(() => {
   authStore.checkAuth()
 })
@@ -24,7 +22,6 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Navigation Bar -->
     <nav class="navbar">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -62,7 +59,6 @@ onMounted(() => {
       </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <router-view />
     </main>

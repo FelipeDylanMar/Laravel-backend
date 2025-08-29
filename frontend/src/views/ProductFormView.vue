@@ -270,7 +270,6 @@ const route = useRoute()
 const router = useRouter()
 const productsStore = useProductsStore()
 
-// State
 const loading = ref(false)
 const submitting = ref(false)
 const submitError = ref('')
@@ -296,18 +295,15 @@ const errors = reactive<Record<string, string>>({
   image: ''
 })
 
-// Computed
 const isEditing = computed(() => !!route.params.id)
 const productId = computed(() => route.params.id as string)
 
-// Carregar categorias da API
 const loadCategories = async () => {
   try {
     const response = await productService.getCategories()
     categories.value = (response as any) || []
   } catch (error) {
     console.error('Erro ao carregar categorias:', error)
-    // Fallback para categorias padrão
     categories.value = [
       { id: 1, nome: 'Eletrônicos', name: 'Eletrônicos' },
       { id: 2, nome: 'Roupas', name: 'Roupas' },
@@ -320,7 +316,6 @@ const loadCategories = async () => {
   }
 }
 
-// Methods
 const fetchProduct = async () => {
   if (!isEditing.value) return
   
@@ -336,10 +331,8 @@ const fetchProduct = async () => {
         preco: productsStore.currentProduct.preco || '',
         category_id: productsStore.currentProduct.category_id || '',
         data_validade: productsStore.currentProduct.data_validade || '',
-        image: null // Reset image field for editing
+        image: null
       })
-      
-      // Set image preview if product has an image
       if (productsStore.currentProduct.image_url) {
         imagePreview.value = productsStore.currentProduct.image_url
       } else if (productsStore.currentProduct.imagem) {
@@ -354,7 +347,6 @@ const fetchProduct = async () => {
 }
 
 const validateForm = () => {
-  // Reset errors
   Object.keys(errors).forEach((key: string) => {
     errors[key] = ''
   })
@@ -392,49 +384,7 @@ const validateForm = () => {
   return isValid
 }
 
-const testPayload = async () => {
-  console.log('=== TESTE DE PAYLOAD ===')
-  
-  // Criar um payload de teste padrão
-  const testFormData = new FormData()
-  testFormData.append('nome', 'Produto Teste')
-  testFormData.append('descricao', 'Esta é uma descrição de teste para o produto')
-  testFormData.append('preco', '29.99')
-  testFormData.append('categoria_id', '1')
-  testFormData.append('data_validade', '2024-12-31')
-  
-  console.log('FormData criado:')
-  for (let [key, value] of testFormData.entries()) {
-    console.log(`${key}: ${value}`)
-  }
-  
-  try {
-    console.log('Enviando para o backend...')
-    const response = await fetch('http://localhost:8000/api/products', {
-      method: 'POST',
-      body: testFormData,
-      headers: {
-        'Accept': 'application/json'
-      }
-    })
-    
-    console.log('Status da resposta:', response.status)
-    console.log('Headers da resposta:', Object.fromEntries(response.headers.entries()))
-    
-    const responseData = await response.text()
-    console.log('Resposta do backend (texto):', responseData)
-    
-    try {
-      const jsonData = JSON.parse(responseData)
-      console.log('Resposta do backend (JSON):', jsonData)
-    } catch (e) {
-      console.log('Resposta não é JSON válido')
-    }
-    
-  } catch (error) {
-    console.error('Erro na requisição:', error)
-  }
-}
+
 
 const handleSubmit = async () => {
   if (!validateForm()) return
@@ -444,7 +394,6 @@ const handleSubmit = async () => {
   
   try {
     if (isEditing.value) {
-      // Para edição, enviar dados JSON
       const productData = {
           nome: form.nome,
           descricao: form.descricao,
@@ -455,13 +404,9 @@ const handleSubmit = async () => {
       
       await productsStore.updateProduct(productId.value as string, productData)
       
-      // Upload image separately if provided
       if (form.image) {
-        // TODO: Implement image upload when backend is ready
-        // await productsStore.uploadProductImage(productId.value, form.image)
       }
     } else {
-      // Para criação, usar FormData para incluir a imagem
       const formData = new FormData()
       formData.append('nome', form.nome)
       formData.append('descricao', form.descricao)
@@ -469,7 +414,6 @@ const handleSubmit = async () => {
       formData.append('data_validade', form.data_validade)
       formData.append('categoria_id', form.category_id.toString())
       
-      // Adicionar imagem se fornecida
       if (form.image) {
         formData.append('imagem', form.image)
       }
@@ -477,14 +421,11 @@ const handleSubmit = async () => {
       await productsStore.createProduct(formData as any)
     }
     
-    // Redirecionar para lista de produtos
     router.push('/products')
   } catch (err: any) {
-    // Tratar erros específicos de validação do backend
     if (err?.response && typeof err.response === 'object') {
       const backendErrors = err.response as any
       
-      // Se há erros de validação específicos
       if (backendErrors.errors) {
         Object.keys(backendErrors.errors).forEach(field => {
           if (field === 'descricao' && backendErrors.errors[field].includes('200')) {
@@ -511,13 +452,11 @@ const handleImageUpload = (event: Event) => {
   
   if (!file) return
   
-  // Validar tipo de arquivo
   if (!file.type.startsWith('image/')) {
     errors.image = 'Por favor, selecione um arquivo de imagem'
     return
   }
   
-  // Validar tamanho (10MB)
   if (file.size > 10 * 1024 * 1024) {
     errors.image = 'A imagem deve ter no máximo 10MB'
     return
@@ -526,7 +465,6 @@ const handleImageUpload = (event: Event) => {
   form.image = file
   errors.image = ''
   
-  // Criar preview
   const reader = new FileReader()
   reader.onload = (e: ProgressEvent<FileReader>) => {
     if (e.target?.result) {
@@ -546,20 +484,16 @@ const removeImage = () => {
   }
 }
 
-// Lifecycle
 onMounted(() => {
-  // Clear any previous product data
   productsStore.clearCurrentProduct()
   productsStore.clearError()
   
-  // Definir data padrão (1 ano a partir de hoje) se não estiver editando
   if (!isEditing.value) {
     const today = new Date()
     const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())
     form.data_validade = nextYear.toISOString().split('T')[0]
   }
   
-  // Carregar categorias e produto
   loadCategories()
   fetchProduct()
 })

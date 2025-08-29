@@ -3,13 +3,10 @@ import type { ErrorResponse } from '@/types'
 // Configuração base da API
 const API_BASE_URL: string = 'http://127.0.0.1:8000/api'
 
-// Interface para erros da API
 interface ApiError extends Error {
   status?: number
   response?: ErrorResponse | string
 }
-
-// Classe para gerenciar chamadas à API
 class ApiService {
   private baseURL: string
 
@@ -74,9 +71,6 @@ class ApiService {
     const queryString = new URLSearchParams(stringParams).toString()
     const url = queryString ? `${endpoint}?${queryString}` : endpoint
     
-    console.log('ApiService - URL final:', `${this.baseURL}${url}`)
-    console.log('ApiService - Parâmetros:', params)
-    
     return this.request<T>(url, {
       method: 'GET'
     })
@@ -116,9 +110,7 @@ class ApiService {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: formData,
-      headers: {
-        // Não definir Content-Type para FormData (o browser define automaticamente)
-      }
+      headers: {}
     })
   }
 }

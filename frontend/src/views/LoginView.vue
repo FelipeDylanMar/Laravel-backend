@@ -75,7 +75,6 @@
           </div>
         </div>
         
-        <!-- Formulário de Login -->
         <div class="order-1 lg:order-2">
           <div class="max-w-md mx-auto space-y-8">
             <div class="card">
@@ -191,7 +190,6 @@ const form = reactive({
   remember: false
 })
 
-// Usar computed para acessar o estado do store
 const loading = computed(() => authStore.isLoading)
 const error = computed(() => authStore.error)
 
@@ -204,11 +202,9 @@ const handleLogin = async () => {
       password: form.password
     })
     
-    // Redirecionar para produtos após login bem-sucedido
     router.push('/products')
   } catch (err) {
-    // O erro já é tratado no store
-    console.error('Erro no login:', err)
+
   }
 }
 </script>
