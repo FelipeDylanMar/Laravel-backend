@@ -19,7 +19,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('role.permissions')->where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -29,8 +29,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
+        // Prepare user data with role and permissions
+        $userData = $user->toArray();
+        $userData['role'] = $user->role?->name;
+        $userData['permissions'] = $user->role?->permissions->pluck('name')->toArray() ?? [];
+
         return response()->json([
-            'user' => $user,
+            'user' => $userData,
             'token' => $token,
             'message' => 'Login realizado com sucesso'
         ]);
@@ -53,7 +58,14 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user()->load('role.permissions');
+        
+        // Prepare user data with role and permissions
+        $userData = $user->toArray();
+        $userData['role'] = $user->role?->name;
+        $userData['permissions'] = $user->role?->permissions->pluck('name')->toArray() ?? [];
+        
+        return response()->json($userData);
     }
 
     /**

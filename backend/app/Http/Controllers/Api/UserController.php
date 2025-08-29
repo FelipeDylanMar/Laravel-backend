@@ -1,0 +1,167 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Role;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+
+class UserController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = User::with('role');
+        
+        // Filter by role if provided
+        if ($request->has('role_id')) {
+            $query->where('role_id', $request->role_id);
+        }
+        
+        $users = $query->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role_id' => 'nullable|exists:roles,id'
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+        
+        $user = User::create($validated);
+        $user->load('role');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'User created successfully',
+            'data' => $user
+        ], 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id): JsonResponse
+    {
+        $user = User::with('role')->findOrFail($id);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'password' => 'nullable|string|min:8|confirmed',
+            'role_id' => 'nullable|exists:roles,id'
+        ]);
+
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+        
+        $user->update($validated);
+        $user->load('role');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'User updated successfully',
+            'data' => $user
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'User deleted successfully'
+        ]);
+    }
+    
+    /**
+     * Assign role to user.
+     */
+    public function assignRole(Request $request, string $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        
+        $validated = $request->validate([
+            'role_id' => 'required|exists:roles,id'
+        ]);
+        
+        $user->update(['role_id' => $validated['role_id']]);
+        $user->load('role');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Role assigned successfully',
+            'data' => $user
+        ]);
+    }
+    
+    /**
+     * Remove role from user.
+     */
+    public function removeRole(string $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        
+        $user->update(['role_id' => null]);
+        $user->load('role');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Role removed successfully',
+            'data' => $user
+        ]);
+    }
+    
+    /**
+     * Get user permissions.
+     */
+    public function getPermissions(string $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        $permissions = $user->getPermissions();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $permissions
+        ]);
+    }
+}
