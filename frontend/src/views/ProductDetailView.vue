@@ -121,7 +121,7 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                     </svg>
-                    {{ getCategoryName(product.category) }}
+                    {{ getCategoryName(product.category_id) }}
                   </span>
                 </div>
               </div>
@@ -165,10 +165,7 @@
                   <dt class="text-sm font-medium text-gray-500">Última Atualização</dt>
                   <dd class="mt-1 text-sm text-gray-900">{{ formatDate(product.updated_at) }}</dd>
                 </div>
-                <div>
-                  <dt class="text-sm font-medium text-gray-500">SKU</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{{ product.sku || 'N/A' }}</dd>
-                </div>
+
               </div>
             </div>
 
@@ -213,14 +210,17 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
+import { useAuthStore } from '@/stores/auth'
+
 
 const route = useRoute()
 const router = useRouter()
 const productsStore = useProductsStore()
+const authStore = useAuthStore()
 
 // State
 
@@ -228,7 +228,7 @@ const imageError = ref(false)
 const imageLoaded = ref(false)
 
 // Computed
-const productId = computed(() => route.params.id)
+const productId = computed(() => route.params.id as string)
 const product = computed(() => productsStore.currentProduct)
 const loading = computed(() => productsStore.isLoading)
 const error = computed(() => productsStore.error)
@@ -268,26 +268,24 @@ const selectedImage = computed(() => {
 
 // Methods
 const fetchProduct = async () => {
+  console.log('ProductDetailView - Iniciando fetchProduct')
+  console.log('ProductDetailView - Product ID:', productId.value)
+  console.log('ProductDetailView - Token:', localStorage.getItem('token'))
+  
   try {
-    await productsStore.fetchProduct(productId.value)
+    await productsStore.fetchProduct(productId.value as string)
+    console.log('ProductDetailView - Produto carregado:', productsStore.currentProduct)
     // Reset image states when loading new product
     imageError.value = false
     imageLoaded.value = false
   } catch (err) {
-    console.error('Erro ao carregar produto:', err)
+    console.error('ProductDetailView - Erro ao carregar produto:', err)
   }
 }
 
-const handleImageError = (event, index) => {
-  console.warn(`Erro ao carregar imagem ${index}:`, event.target.src)
-  // Se for a última imagem (placeholder), marcar como erro geral
-  if (index === productImages.value.length - 1) {
-    imageError.value = true
-  }
-}
-
-const handleMainImageError = (event) => {
-  console.warn('Erro ao carregar imagem principal:', event.target.src)
+const handleMainImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  console.warn('Erro ao carregar imagem principal:', target.src)
   imageError.value = true
   imageLoaded.value = false
 }
@@ -298,7 +296,7 @@ const deleteProduct = async () => {
   }
   
   try {
-    await productsStore.deleteProduct(productId.value)
+    await productsStore.deleteProduct(productId.value as string)
     // Redirecionar para lista de produtos
     router.push('/products')
   } catch (err) {
@@ -306,14 +304,15 @@ const deleteProduct = async () => {
   }
 }
 
-const formatPrice = (price) => {
+const formatPrice = (price: string | number | undefined) => {
+  if (price === undefined || price === null) return '0,00'
   return new Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(price)
+  }).format(typeof price === 'string' ? parseFloat(price) : price)
 }
 
-const formatDate = (dateString) => {
+const formatDate = (dateString: string | null | undefined) => {
   if (!dateString) return 'N/A'
   
   return new Intl.DateTimeFormat('pt-BR', {
@@ -325,30 +324,52 @@ const formatDate = (dateString) => {
   }).format(new Date(dateString))
 }
 
-const getCategoryName = (category) => {
-  if (category && category.nome) {
-    return category.nome
+const getCategoryName = (categoryId: number | string | null | undefined) => {
+  // Mapeamento básico de categorias
+  const categoryMap: Record<number, string> = {
+    1: 'Eletrônicos',
+    2: 'Roupas',
+    3: 'Casa e Jardim',
+    4: 'Esportes',
+    5: 'Livros',
+    6: 'Beleza',
+    7: 'Outros'
   }
-  if (typeof category === 'string') {
-    return category
+  
+  if (typeof categoryId === 'number') {
+    return categoryMap[categoryId] || 'Categoria não definida'
+  }
+  if (typeof categoryId === 'string') {
+    const id = parseInt(categoryId)
+    return categoryMap[id] || 'Categoria não definida'
   }
   return 'Categoria não definida'
-}
-
-const resetImageStates = () => {
-  imageError.value = false
-  imageLoaded.value = false
 }
 
 
 
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
+  console.log('ProductDetailView - onMounted iniciado')
+  console.log('ProductDetailView - Token no localStorage:', localStorage.getItem('token'))
+  console.log('ProductDetailView - isAuthenticated:', authStore.isAuthenticated)
+  
+  // Verificar autenticação primeiro
+  if (!authStore.isAuthenticated) {
+    console.log('ProductDetailView - Usuário não autenticado, redirecionando para login')
+    router.push('/login')
+    return
+  }
+  
   // Clear any previous product data
   productsStore.clearCurrentProduct()
   productsStore.clearError()
   
-  fetchProduct()
+  await fetchProduct()
+  
+  if (productsStore.error) {
+    console.error('ProductDetailView - Erro ao carregar produto:', productsStore.error)
+  }
 })
 </script>
 

@@ -93,16 +93,16 @@
 
       <!-- Products Grid -->
       <div v-else-if="products.length > 0" class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-        <div
-          v-for="product in products"
-          :key="product.id"
-          class="card hover:shadow-lg transition-shadow duration-200 flex flex-col h-full"
-        >
+        <template v-for="product in products" :key="product?.id || Math.random()">
+          <div
+            v-if="product && product.id"
+            class="card hover:shadow-lg transition-shadow duration-200 flex flex-col h-full"
+          >
           <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 rounded-t-lg">
             <img
-              v-if="product.image_url || product.imagem"
-              :src="product.image_url || (product.imagem ? `http://127.0.0.1:8000/images/${product.imagem}` : '')"
-              :alt="product.nome || product.name"
+              v-if="product?.image_url || product?.imagem"
+              :src="product?.image_url || (product?.imagem ? `http://127.0.0.1:8000/images/${product?.imagem}` : '')"
+              :alt="product?.nome || product?.name || 'Produto'"
               class="h-48 w-full object-cover object-center"
             />
             <div v-else class="h-48 w-full bg-gray-200 flex items-center justify-center">
@@ -112,29 +112,29 @@
             </div>
           </div>
           <div class="p-4 flex flex-col flex-grow">
-            <h3 class="text-base font-medium text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">{{ product.nome || product.name }}</h3>
-            <p class="text-sm text-gray-500 line-clamp-3 flex-grow mb-3 min-h-[3.75rem]">{{ product.descricao || product.description }}</p>
+            <h3 class="text-base font-medium text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">{{ product?.nome || product?.name || 'Produto sem nome' }}</h3>
+            <p class="text-sm text-gray-500 line-clamp-3 flex-grow mb-3 min-h-[3.75rem]">{{ product?.descricao || product?.description || 'Sem descrição' }}</p>
             <div class="mt-auto">
               <div class="flex items-center justify-between mb-3">
                 <p class="text-lg font-semibold text-gray-900 truncate">
-                  R$ {{ formatPrice(product.preco || product.price) }}
+                  R$ {{ formatPrice(product?.preco || product?.price || 0) }}
                 </p>
               </div>
               <div class="flex flex-wrap gap-2 justify-center">
                 <router-link
-                  :to="`/products/${product.id}`"
+                  :to="`/products/${product?.id}`"
                   class="text-innyx-primary-600 hover:text-innyx-primary-800 text-xs font-medium transition-colors px-2 py-1 bg-innyx-primary-50 rounded hover:bg-innyx-primary-100"
                 >
                   Ver
                 </router-link>
                 <router-link
-                  :to="`/products/${product.id}/edit`"
+                  :to="`/products/${product?.id}/edit`"
                   class="text-innyx-secondary-600 hover:text-innyx-secondary-800 text-xs font-medium transition-colors px-2 py-1 bg-innyx-secondary-50 rounded hover:bg-innyx-secondary-100"
                 >
                   Editar
                 </router-link>
                 <button
-                  @click="deleteProduct(product.id)"
+                  @click="deleteProduct(product?.id)"
                   class="text-red-600 hover:text-red-900 text-xs font-medium transition-colors px-2 py-1 bg-red-50 rounded hover:bg-red-100"
                 >
                   Excluir
@@ -143,6 +143,7 @@
             </div>
           </div>
         </div>
+        </template>
       </div>
 
       <!-- Empty State -->
@@ -235,11 +236,19 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
 import { useAuthStore } from '@/stores/auth'
+import type { Filters } from '@/types'
+
+// Extend Window interface for searchTimeout
+declare global {
+  interface Window {
+    searchTimeout?: ReturnType<typeof setTimeout>
+  }
+}
 
 const router = useRouter()
 const productsStore = useProductsStore()
@@ -275,10 +284,10 @@ const visiblePages = computed(() => {
 // Methods
 const fetchProducts = async (page = currentPage.value) => {
   try {
-    const filters = {
+    const filters: Partial<Filters> = {
       search: searchQuery.value,
       sort_by: sortBy.value,
-      sort_order: sortOrder.value
+      sort_order: sortOrder.value as 'asc' | 'desc'
     }
     console.log('ProductsView - Enviando filtros:', filters)
     await productsStore.fetchProducts(page, filters)
@@ -300,7 +309,7 @@ const toggleSortOrder = () => {
   fetchProducts(1)
 }
 
-const goToPage = (page) => {
+const goToPage = (page: number) => {
   fetchProducts(page)
 }
 
@@ -316,7 +325,7 @@ const nextPage = () => {
   }
 }
 
-const deleteProduct = async (id) => {
+const deleteProduct = async (id: string | number) => {
   if (!confirm('Tem certeza que deseja excluir este produto?')) {
     return
   }
@@ -330,8 +339,8 @@ const deleteProduct = async (id) => {
   }
 }
 
-const formatPrice = (price) => {
-  const numericPrice = parseFloat(price)
+const formatPrice = (price: string | number) => {
+  const numericPrice = parseFloat(price.toString())
   if (isNaN(numericPrice) || numericPrice < 0) {
     return '0,00'
   }

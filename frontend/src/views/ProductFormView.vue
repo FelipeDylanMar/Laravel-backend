@@ -88,11 +88,17 @@
                 v-model="form.descricao"
                 rows="4"
                 required
+                maxlength="200"
                 class="input-field"
                 :class="{ 'border-red-300': errors.descricao }"
                 placeholder="Digite a descrição do produto"
               ></textarea>
-              <p v-if="errors.descricao" class="mt-2 text-sm text-red-600">{{ errors.descricao }}</p>
+              <div class="flex justify-between items-center mt-1">
+                <p v-if="errors.descricao" class="text-sm text-red-600">{{ errors.descricao }}</p>
+                <p class="text-sm text-gray-500 ml-auto">
+                  {{ form.descricao.length }}/200 caracteres
+                </p>
+              </div>
             </div>
           </div>
 
@@ -119,23 +125,23 @@
 
           <!-- Category -->
           <div>
-            <label for="categoria_id" class="block text-sm font-medium text-gray-700">
+            <label for="category_id" class="block text-sm font-medium text-gray-700">
               Categoria *
             </label>
             <div class="mt-1">
               <select
-                id="categoria_id"
-                v-model="form.categoria_id"
+                id="category_id"
+                v-model="form.category_id"
                 required
                 class="input-field"
-                :class="{ 'border-red-300': errors.categoria_id }"
+                :class="{ 'border-red-300': errors.category_id }"
               >
                 <option value="">Selecione uma categoria</option>
                 <option v-for="category in categories" :key="category.id" :value="category.id">
                   {{ category.nome }}
                 </option>
               </select>
-              <p v-if="errors.categoria_id" class="mt-2 text-sm text-red-600">{{ errors.categoria_id }}</p>
+              <p v-if="errors.category_id" class="mt-2 text-sm text-red-600">{{ errors.category_id }}</p>
             </div>
           </div>
 
@@ -253,11 +259,12 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
 import productService from '@/services/productService'
+import type { Category, ProductFormData } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -268,47 +275,47 @@ const loading = ref(false)
 const submitting = ref(false)
 const submitError = ref('')
 const imagePreview = ref('')
-const imageInput = ref(null)
-const categories = ref([])
+const imageInput = ref<HTMLInputElement | null>(null)
+const categories = ref<Category[]>([])
 
-const form = reactive({
+const form = reactive<ProductFormData & { image: File | null }>({
   nome: '',
   descricao: '',
   preco: '',
-  categoria_id: '',
+  category_id: '',
   data_validade: '',
   image: null
 })
 
-const errors = reactive({
+const errors = reactive<Record<string, string>>({
   nome: '',
   descricao: '',
   preco: '',
-  categoria_id: '',
+  category_id: '',
   data_validade: '',
   image: ''
 })
 
 // Computed
 const isEditing = computed(() => !!route.params.id)
-const productId = computed(() => route.params.id)
+const productId = computed(() => route.params.id as string)
 
 // Carregar categorias da API
 const loadCategories = async () => {
   try {
     const response = await productService.getCategories()
-    categories.value = response || []
+    categories.value = (response as any) || []
   } catch (error) {
     console.error('Erro ao carregar categorias:', error)
     // Fallback para categorias padrão
     categories.value = [
-      { id: 1, nome: 'Eletrônicos' },
-      { id: 2, nome: 'Roupas' },
-      { id: 3, nome: 'Livros' },
-      { id: 4, nome: 'Casa e Jardim' },
-      { id: 5, nome: 'Esportes' },
-      { id: 6, nome: 'Brinquedos' },
-      { id: 7, nome: 'Outros' }
+      { id: 1, nome: 'Eletrônicos', name: 'Eletrônicos' },
+      { id: 2, nome: 'Roupas', name: 'Roupas' },
+      { id: 3, nome: 'Livros', name: 'Livros' },
+      { id: 4, nome: 'Casa e Jardim', name: 'Casa e Jardim' },
+      { id: 5, nome: 'Esportes', name: 'Esportes' },
+      { id: 6, nome: 'Brinquedos', name: 'Brinquedos' },
+      { id: 7, nome: 'Outros', name: 'Outros' }
     ]
   }
 }
@@ -320,14 +327,14 @@ const fetchProduct = async () => {
   loading.value = true
   
   try {
-    await productsStore.fetchProduct(productId.value)
+    await productsStore.fetchProduct(productId.value as string)
     
     if (productsStore.currentProduct) {
       Object.assign(form, {
         nome: productsStore.currentProduct.nome || '',
         descricao: productsStore.currentProduct.descricao || '',
         preco: productsStore.currentProduct.preco || '',
-        categoria_id: productsStore.currentProduct.categoria_id || '',
+        category_id: productsStore.currentProduct.category_id || '',
         data_validade: productsStore.currentProduct.data_validade || '',
         image: null // Reset image field for editing
       })
@@ -348,7 +355,7 @@ const fetchProduct = async () => {
 
 const validateForm = () => {
   // Reset errors
-  Object.keys(errors).forEach(key => {
+  Object.keys(errors).forEach((key: string) => {
     errors[key] = ''
   })
   
@@ -362,15 +369,18 @@ const validateForm = () => {
   if (!form.descricao.trim()) {
     errors.descricao = 'Descrição é obrigatória'
     isValid = false
+  } else if (form.descricao.length > 200) {
+    errors.descricao = 'Descrição deve ter no máximo 200 caracteres'
+    isValid = false
   }
   
-  if (!form.preco || form.preco <= 0) {
+  if (!form.preco || parseFloat(form.preco.toString()) <= 0) {
     errors.preco = 'Preço deve ser maior que zero'
     isValid = false
   }
   
-  if (!form.categoria_id) {
-    errors.categoria_id = 'Categoria é obrigatória'
+  if (!form.category_id) {
+    errors.category_id = 'Categoria é obrigatória'
     isValid = false
   }
   
@@ -436,14 +446,14 @@ const handleSubmit = async () => {
     if (isEditing.value) {
       // Para edição, enviar dados JSON
       const productData = {
-        nome: form.nome,
-        descricao: form.descricao,
-        preco: parseFloat(form.preco),
-        data_validade: form.data_validade,
-        categoria_id: parseInt(form.categoria_id)
-      }
+          nome: form.nome,
+          descricao: form.descricao,
+          preco: parseFloat(form.preco.toString()),
+          data_validade: form.data_validade,
+          category_id: parseInt(form.category_id.toString())
+        }
       
-      await productsStore.updateProduct(productId.value, productData)
+      await productsStore.updateProduct(productId.value as string, productData)
       
       // Upload image separately if provided
       if (form.image) {
@@ -457,27 +467,47 @@ const handleSubmit = async () => {
       formData.append('descricao', form.descricao)
       formData.append('preco', form.preco.toString())
       formData.append('data_validade', form.data_validade)
-      formData.append('categoria_id', form.categoria_id.toString())
+      formData.append('categoria_id', form.category_id.toString())
       
       // Adicionar imagem se fornecida
       if (form.image) {
         formData.append('imagem', form.image)
       }
       
-      await productsStore.createProduct(formData)
+      await productsStore.createProduct(formData as any)
     }
     
     // Redirecionar para lista de produtos
     router.push('/products')
-  } catch (err) {
-    submitError.value = productsStore.error || 'Erro ao salvar produto'
+  } catch (err: any) {
+    // Tratar erros específicos de validação do backend
+    if (err?.response && typeof err.response === 'object') {
+      const backendErrors = err.response as any
+      
+      // Se há erros de validação específicos
+      if (backendErrors.errors) {
+        Object.keys(backendErrors.errors).forEach(field => {
+          if (field === 'descricao' && backendErrors.errors[field].includes('200')) {
+            errors.descricao = 'Descrição deve ter no máximo 200 caracteres'
+          } else if (errors.hasOwnProperty(field)) {
+            errors[field] = backendErrors.errors[field][0] || backendErrors.errors[field]
+          }
+        })
+        submitError.value = 'Por favor, corrija os erros nos campos destacados'
+      } else {
+        submitError.value = backendErrors.message || 'Erro de validação do servidor'
+      }
+    } else {
+      submitError.value = productsStore.error || err?.message || 'Erro ao salvar produto'
+    }
   } finally {
     submitting.value = false
   }
 }
 
-const handleImageUpload = (event) => {
-  const file = event.target.files[0]
+const handleImageUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
   
   if (!file) return
   
@@ -498,8 +528,10 @@ const handleImageUpload = (event) => {
   
   // Criar preview
   const reader = new FileReader()
-  reader.onload = (e) => {
-    imagePreview.value = e.target.result
+  reader.onload = (e: ProgressEvent<FileReader>) => {
+    if (e.target?.result) {
+      imagePreview.value = e.target.result as string
+    }
   }
   reader.readAsDataURL(file)
 }
