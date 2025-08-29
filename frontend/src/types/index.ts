@@ -22,6 +22,40 @@ export enum ApiStatus {
   ERROR = 'error'
 }
 
+/** Available user roles in the system */
+export enum UserRole {
+  ADMIN = 'admin',
+  MANAGER = 'manager',
+  USER = 'user',
+  GUEST = 'guest'
+}
+
+/** Available permissions in the system */
+export enum Permission {
+  // Product permissions
+  PRODUCTS_VIEW = 'products.view',
+  PRODUCTS_CREATE = 'products.create',
+  PRODUCTS_EDIT = 'products.edit',
+  PRODUCTS_DELETE = 'products.delete',
+  
+  // Category permissions
+  CATEGORIES_VIEW = 'categories.view',
+  CATEGORIES_CREATE = 'categories.create',
+  CATEGORIES_EDIT = 'categories.edit',
+  CATEGORIES_DELETE = 'categories.delete',
+  
+  // User management permissions
+  USERS_VIEW = 'users.view',
+  USERS_CREATE = 'users.create',
+  USERS_EDIT = 'users.edit',
+  USERS_DELETE = 'users.delete',
+  
+  // System permissions
+  ADMIN_PANEL = 'admin.panel',
+  REPORTS_VIEW = 'reports.view',
+  SETTINGS_MANAGE = 'settings.manage'
+}
+
 // ============================================================================
 // PRODUCT TYPES
 // ============================================================================
@@ -167,6 +201,10 @@ export interface User {
   created_at?: string
   /** Last update timestamp */
   updated_at?: string
+  /** User's role in the system */
+  role?: UserRole | string
+  /** User's permissions */
+  permissions?: Permission[] | string[]
 }
 
 /**
@@ -392,4 +430,56 @@ export interface PasswordResetRequest {
   email: string
   /** Index signature for API compatibility */
   [key: string]: string
+}
+
+// ============================================================================
+// ACL TYPES
+// ============================================================================
+
+/** Role definition interface */
+export interface Role {
+  /** Unique role identifier */
+  id: string
+  /** Role name */
+  name: string
+  /** Role description */
+  description?: string
+  /** Permissions associated with this role */
+  permissions: Permission[]
+  /** Role level (higher = more permissions) */
+  level: number
+}
+
+/** Permission check result */
+export interface PermissionCheck {
+  /** Whether the permission is granted */
+  granted: boolean
+  /** Reason for denial (if applicable) */
+  reason?: string
+}
+
+/** ACL state interface */
+export interface AclState {
+  /** Current user's role */
+  userRole: UserRole | null
+  /** Current user's permissions */
+  userPermissions: Permission[]
+  /** Available roles in the system */
+  availableRoles: Role[]
+  /** Loading state */
+  loading: boolean
+  /** Error state */
+  error: string | null
+}
+
+/** Route guard configuration */
+export interface RouteGuard {
+  /** Required permissions to access the route */
+  permissions?: Permission[]
+  /** Required role to access the route */
+  role?: UserRole
+  /** Whether to redirect on failure */
+  redirect?: string
+  /** Custom validation function */
+  validate?: (user: User | null) => boolean
 }

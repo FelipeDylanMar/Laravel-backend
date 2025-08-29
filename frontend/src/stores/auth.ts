@@ -3,6 +3,7 @@ import { ref, computed, type Ref, type ComputedRef } from 'vue'
 import authService from '@/services/authService'
 import type { User, LoginCredentials } from '@/types'
 import type { LoginResponse } from '@/services/authService'
+import { useAclStore } from './acl'
 
 export const useAuthStore = defineStore('auth', () => {
   const user: Ref<User | null> = ref(null)
@@ -12,6 +13,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated: ComputedRef<boolean> = computed(() => !!token.value)
   const currentUser: ComputedRef<User | null> = computed(() => user.value)
+  
+  // Initialize ACL store
+  const aclStore = useAclStore()
   const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
     isLoading.value = true
     error.value = null
@@ -22,6 +26,9 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = data.token
       user.value = data.user
       localStorage.setItem('token', data.token)
+      
+      // Initialize ACL with user data
+      aclStore.initializeFromUser(data.user)
       
       return data
     } catch (err: unknown) {
@@ -41,6 +48,9 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       token.value = null
       localStorage.removeItem('token')
+      
+      // Reset ACL data
+      aclStore.resetAcl()
     }
   }
 
@@ -51,6 +61,10 @@ export const useAuthStore = defineStore('auth', () => {
       const userData: User | null = await authService.verifyToken()
       if (userData) {
         user.value = userData
+        
+        // Initialize ACL with user data
+        aclStore.initializeFromUser(userData)
+        
         return true
       } else {
         await logout()
