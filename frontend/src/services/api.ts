@@ -101,9 +101,7 @@ class ApiService {
         data = await response.text()
       }
 
-      // Handle non-successful responses
       if (!response.ok) {
-        // Retry on server errors (5xx) if retries available
         if (response.status >= 500 && retryCount < API_CONFIG.MAX_RETRIES) {
           await this.sleep(API_CONFIG.RETRY_DELAY * (retryCount + 1))
           return this.request<T>(endpoint, options, retryCount + 1)
@@ -116,7 +114,6 @@ class ApiService {
 
       return data as T
     } catch (error) {
-      // Retry on network errors if retries available
       if (retryCount < API_CONFIG.MAX_RETRIES && 
           (error instanceof TypeError || error instanceof DOMException)) {
         await this.sleep(API_CONFIG.RETRY_DELAY * (retryCount + 1))

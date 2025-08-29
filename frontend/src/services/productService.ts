@@ -29,15 +29,8 @@ class ProductService {
     }
   }
 
-
-  /**
-   * Create a new product
-   * @param productData - Product data to create
-   * @returns Promise with created product data
-   */
   async createProduct(productData: ProductFormData | FormData): Promise<Product> {
     try {
-      // Convert ProductFormData to FormData if needed
       const formData = productData instanceof FormData ? productData : this.convertToFormData(productData)
       const response = await apiService.post<ApiResponse<Product>>('/products', formData)
       return response.data
@@ -139,27 +132,22 @@ class ProductService {
   validateProduct(productData: Partial<ProductFormData>): { isValid: boolean; errors: string[] } {
     const errors: string[] = []
 
-    // Validate product name
     if (!productData.name || productData.name.trim().length < 3) {
       errors.push('Nome deve ter pelo menos 3 caracteres')
     }
 
-    // Validate product description
     if (!productData.description || productData.description.trim().length < 10) {
       errors.push('Descrição deve ter pelo menos 10 caracteres')
     }
 
-    // Validate product price
     if (!productData.price || Number(productData.price) <= 0) {
       errors.push('Preço deve ser maior que zero')
     }
 
-    // Validate category selection
     if (!productData.category_id) {
       errors.push('Categoria é obrigatória')
     }
 
-    // Validate stock quantity if provided
     if (productData.stock !== undefined && Number(productData.stock) < 0) {
       errors.push('Estoque não pode ser negativo')
     }

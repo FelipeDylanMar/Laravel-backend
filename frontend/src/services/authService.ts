@@ -19,7 +19,6 @@ class AuthService {
     try {
       const response = await apiService.post<LoginResponse>('/login', credentials)
       
-      // Store token in localStorage for subsequent requests
       if (response.token) {
         localStorage.setItem('token', response.token)
       }

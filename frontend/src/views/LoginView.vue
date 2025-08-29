@@ -232,7 +232,7 @@ const handleLogin = async () => {
     
     router.push('/products')
   } catch (err) {
-
+    console.error('Erro no login:', err)
   }
 }
 </script>

@@ -14,7 +14,6 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated: ComputedRef<boolean> = computed(() => !!token.value)
   const currentUser: ComputedRef<User | null> = computed(() => user.value)
   
-  // Initialize ACL store
   const aclStore = useAclStore()
   const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
     isLoading.value = true
@@ -27,7 +26,6 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = data.user
       localStorage.setItem('token', data.token)
       
-      // Initialize ACL with user data
       aclStore.initializeFromUser(data.user)
       
       return data
@@ -49,7 +47,6 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = null
       localStorage.removeItem('token')
       
-      // Reset ACL data
       aclStore.resetAcl()
     }
   }
@@ -62,7 +59,6 @@ export const useAuthStore = defineStore('auth', () => {
       if (userData) {
         user.value = userData
         
-        // Initialize ACL with user data
         aclStore.initializeFromUser(userData)
         
         return true

@@ -71,11 +71,6 @@ import { useAuthStore } from '@/stores/auth'
 import { usePermissions } from '@/composables/usePermissions'
 import UserRoleDisplay from '@/components/ACL/UserRoleDisplay.vue'
 
-/**
- * UnauthorizedView
- * Displays when user tries to access a page without proper permissions
- */
-
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
@@ -85,37 +80,19 @@ const canGoBack = ref(false)
 const requestedRoute = ref('')
 const requiredPermissions = ref('')
 
-/**
- * Check if user is authenticated
- */
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
-/**
- * Initialize component data
- */
 onMounted(() => {
-  // Check if we can go back
   canGoBack.value = window.history.length > 1
-  
-  // Get requested route from query params
   requestedRoute.value = (route.query.from as string) || route.fullPath
-  
-  // Get required permissions from query params
   requiredPermissions.value = (route.query.permissions as string) || 'Não especificadas'
 })
 
-/**
- * Go back to previous page
- */
 function goBack() {
   router.go(-1)
 }
 
-/**
- * Request access (placeholder function)
- */
 function requestAccess() {
-  // In a real application, this would send a request to administrators
   alert('Funcionalidade de solicitação de acesso será implementada em breve.')
 }
 </script>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
@@ -46,7 +46,6 @@ const logout = async () => {
   })
 }
 
-// Close dropdown when clicking outside
 const handleClickOutside = (event: Event) => {
   const target = event.target as HTMLElement
   const dropdown = document.getElementById('user-profile-dropdown')
@@ -55,7 +54,6 @@ const handleClickOutside = (event: Event) => {
   }
 }
 
-// Add event listener when dropdown is open
 const addClickOutsideListener = () => {
   if (isDropdownOpen.value) {
     document.addEventListener('click', handleClickOutside)
@@ -64,13 +62,10 @@ const addClickOutsideListener = () => {
   }
 }
 
-// Watch for dropdown state changes
 const watchDropdown = () => {
   addClickOutsideListener()
 }
 
-// Clean up event listener on unmount
-import { onUnmounted, watch } from 'vue'
 watch(isDropdownOpen, watchDropdown)
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)

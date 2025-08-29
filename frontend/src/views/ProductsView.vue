@@ -60,7 +60,7 @@
             >
               <svg
                 class="h-4 w-4"
-                :class="{ 'transform rotate-180': sortOrder === 'desc' }"
+                :class="{ 'transform rotate-180': sortOrder === SortOrder.DESC }"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -241,6 +241,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
 import type { Filters } from '@/types'
+import { SortOrder } from '@/types'
 
 declare global {
   interface Window {
@@ -253,7 +254,7 @@ const productsStore = useProductsStore()
 
 const searchQuery = ref('')
 const sortBy = ref('name')
-const sortOrder = ref('asc')
+const sortOrder = ref<SortOrder>(SortOrder.ASC)
 
 const products = computed(() => productsStore.products)
 const loading = computed(() => productsStore.isLoading)
@@ -277,10 +278,10 @@ const visiblePages = computed(() => {
 const fetchProducts = async (page = currentPage.value) => {
   try {
     const filters: Partial<Filters> = {
-      search: searchQuery.value,
-      sort_by: sortBy.value,
-      sort_order: sortOrder.value as 'asc' | 'desc'
-    }
+    search: searchQuery.value,
+    sort_by: sortBy.value,
+    sort_order: sortOrder.value
+  }
     await productsStore.fetchProducts(page, filters)
   } catch (err) {
     console.error('Erro ao carregar produtos:', err)
@@ -296,7 +297,7 @@ const handleSort = () => {
 }
 
 const toggleSortOrder = () => {
-  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  sortOrder.value = sortOrder.value === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC
   fetchProducts(1)
 }
 
