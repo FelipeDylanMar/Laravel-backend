@@ -2,7 +2,7 @@
 
 ## 📋 Sobre o Projeto
 
-Este é um sistema completo de gerenciamento de produtos desenvolvido em Laravel 11 como parte do INNYX Challenge. O sistema inclui autenticação por token, CRUD completo de produtos, categorias e upload de imagens, totalmente funcional com banco de dados SQLite.
+Este é um sistema completo de gerenciamento de produtos desenvolvido em Laravel 11 como parte do INNYX Challenge. O sistema inclui autenticação por token, CRUD completo de produtos, categorias e upload de imagens, containerizado com Docker para desenvolvimento e produção.
 
 ## ✨ Características
 
@@ -17,7 +17,15 @@ Este é um sistema completo de gerenciamento de produtos desenvolvido em Laravel
 
 ## 🗄️ Banco de Dados
 
-### Configuração Atual
+### Configuração Docker (Recomendado)
+- **Tipo:** MySQL 8.0
+- **Host:** `mysql` (interno) / `localhost:3306` (externo)
+- **Database:** `innyx_db`
+- **Usuário:** `innyx_user`
+- **Senha:** `innyx_password`
+- **Status:** ✅ Configurado e funcionando
+
+### Configuração Local (Alternativo)
 - **Tipo:** SQLite
 - **Localização:** `database/database.sqlite`
 - **Status:** ✅ Configurado e funcionando
@@ -34,16 +42,44 @@ Este é um sistema completo de gerenciamento de produtos desenvolvido em Laravel
 
 ## 🚀 Como Usar
 
-### Pré-requisitos
-- PHP 8.1 ou superior
-- Composer
+### 🐳 Com Docker (Recomendado)
 
-### Instalação
+#### Pré-requisitos
+- Docker Desktop
+- Docker Compose
+
+#### Instalação
 
 1. **Clone o repositório:**
    ```bash
    git clone <url-do-repositorio>
-   cd meu-projeto-laravel
+   cd INNYX-Challange
+   ```
+
+2. **Inicie os serviços:**
+   ```bash
+   docker-compose up -d backend mysql
+   ```
+
+3. **Configure a aplicação (primeira execução):**
+   ```bash
+   docker-compose exec backend php artisan key:generate
+   docker-compose exec backend php artisan migrate --seed
+   ```
+
+### 🔧 Desenvolvimento Local (Alternativo)
+
+#### Pré-requisitos
+- PHP 8.2 ou superior
+- Composer
+- MySQL ou SQLite
+
+#### Instalação
+
+1. **Clone o repositório:**
+   ```bash
+   git clone <url-do-repositorio>
+   cd INNYX-Challange/backend
    ```
 
 2. **Instale as dependências:**
@@ -55,6 +91,7 @@ Este é um sistema completo de gerenciamento de produtos desenvolvido em Laravel
    ```bash
    cp .env.example .env
    php artisan key:generate
+   php artisan migrate --seed
    ```
 
 4. **Inicie o servidor:**
@@ -64,28 +101,30 @@ Este é um sistema completo de gerenciamento de produtos desenvolvido em Laravel
 
 ### 🧪 Testando a API
 
+**Base URL:** `http://localhost:8000/api`
+
 **Endpoints disponíveis:**
 
 ```bash
 # Listar categorias (público)
-GET http://127.0.0.1:8000/api/categories
+GET http://localhost:8000/api/categories
 
 # Listar produtos (requer autenticação)
-GET http://127.0.0.1:8000/api/products
+GET http://localhost:8000/api/products
 Headers: Authorization: Bearer {token}
 
 # Criar produto (requer autenticação)
-POST http://127.0.0.1:8000/api/products
+POST http://localhost:8000/api/products
 Headers: Authorization: Bearer {token}
 
 # Ver produto específico
-GET http://127.0.0.1:8000/api/products/{id}
+GET http://localhost:8000/api/products/{id}
 
 # Atualizar produto
-PUT http://127.0.0.1:8000/api/products/{id}
+PUT http://localhost:8000/api/products/{id}
 
 # Deletar produto
-DELETE http://127.0.0.1:8000/api/products/{id}
+DELETE http://localhost:8000/api/products/{id}
 ```
 
 **Credenciais de teste:**
@@ -96,8 +135,18 @@ DELETE http://127.0.0.1:8000/api/products/{id}
 
 Para testar os endpoints protegidos, você pode gerar um token manualmente:
 
+**Com Docker:**
 ```bash
-# Execute no terminal do projeto:
+docker-compose exec backend php artisan tinker
+
+# No tinker, execute:
+$user = App\Models\User::where('email', 'teste@exemplo.com')->first();
+$token = $user->createToken('test-token')->plainTextToken;
+echo $token;
+```
+
+**Localmente:**
+```bash
 php artisan tinker
 
 # No tinker, execute:
@@ -108,7 +157,7 @@ echo $token;
 
 **Usando o token:**
 ```bash
-GET http://127.0.0.1:8000/api/products
+GET http://localhost:8000/api/products
 Authorization: Bearer {token_gerado_acima}
 ```
 

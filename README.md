@@ -1,15 +1,22 @@
 # Sistema de Gerenciamento de Produtos
 
-Sistema completo de gerenciamento de produtos com backend Laravel e frontend Vue.js 3.
+Sistema completo de gerenciamento de produtos com backend Laravel e frontend Vue.js 3, containerizado com Docker para desenvolvimento e produção.
 
 ## 📁 Estrutura do Projeto
 
 ```
 INNYX-Challange/
-├── backend/          # API Laravel 9+ com PHP 8+
-├── frontend/         # Aplicação Vue.js 3 com TypeScript
-├── .gitignore        # Configurações do Git
-└── README.md         # Este arquivo
+├── backend/              # API Laravel 9+ com PHP 8+
+│   ├── Dockerfile        # Container otimizado multi-stage
+│   └── database/mysql.cnf # Configurações MySQL otimizadas
+├── frontend/             # Aplicação Vue.js 3 com TypeScript
+│   ├── Dockerfile        # Container otimizado com Nginx
+│   └── nginx.conf        # Configuração Nginx para produção
+├── docker-compose.yml    # Orquestração dos containers
+├── dev-start.ps1         # Script de inicialização rápida
+├── OTIMIZACOES_DOCKER.md # Documentação técnica das otimizações
+├── .gitignore           # Configurações do Git
+└── README.md            # Este arquivo
 ```
 
 ## 🚀 Backend (Laravel)
@@ -32,6 +39,12 @@ INNYX-Challange/
 
 ### Como executar o Backend
 
+**Com Docker (Recomendado):**
+```bash
+docker-compose up -d backend mysql
+```
+
+**Localmente:**
 ```bash
 cd backend
 composer install
@@ -41,7 +54,7 @@ php artisan migrate --seed
 php artisan serve
 ```
 
-**Servidor:** http://127.0.0.1:8000
+**Servidor:** http://localhost:8000
 
 ### Credenciais de Teste
 - **Email:** teste@exemplo.com
@@ -83,17 +96,82 @@ php artisan serve
 
 ### Como executar o Frontend
 
+**Com Docker (Recomendado):**
 ```bash
-cd frontend
-# Comandos serão adicionados após setup inicial
+docker-compose up -d frontend
 ```
 
-## 🔧 Desenvolvimento
+**Localmente:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+**Servidor:** http://localhost:5173
+
+## 🐳 Desenvolvimento com Docker (Recomendado)
+
+### Pré-requisitos
+- **Docker Desktop**
+- **Docker Compose**
+- **PowerShell** (Windows)
+
+### Inicialização Rápida
+
+```powershell
+# Execute o script de desenvolvimento
+.\dev-start.ps1
+```
+
+Ou manualmente:
+
+```bash
+# Clone o repositório
+git clone <repository-url>
+cd INNYX-Challange
+
+# Inicie todos os serviços
+docker-compose up -d
+
+# Gere a chave da aplicação Laravel (primeira execução)
+docker-compose exec backend php artisan key:generate
+
+# Execute as migrações (primeira execução)
+docker-compose exec backend php artisan migrate --seed
+```
+
+### URLs de Acesso
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:8000
+- **MySQL:** localhost:3306
+
+### Comandos Úteis
+
+```bash
+# Ver logs dos containers
+docker-compose logs -f
+
+# Parar todos os serviços
+docker-compose down
+
+# Rebuild dos containers
+docker-compose up --build
+
+# Executar comandos no backend
+docker-compose exec backend php artisan migrate
+docker-compose exec backend php artisan test
+
+# Executar comandos no frontend
+docker-compose exec frontend npm run test
+```
+
+## 🔧 Desenvolvimento Local (Alternativo)
 
 ### Pré-requisitos
 - **PHP 8+**
 - **Composer**
-- **Node.js 16+**
+- **Node.js 18+**
 - **NPM/Yarn**
 - **MySQL** (opcional, SQLite configurado)
 
@@ -118,7 +196,8 @@ cd frontend
 3. **Configure o Frontend:**
    ```bash
    cd ../frontend
-   # Comandos serão adicionados
+   npm install
+   npm run dev
    ```
 
 ## 📚 Documentação
@@ -130,20 +209,51 @@ cd frontend
 ## 🧪 Testes
 
 ### Backend
+**Com Docker:**
+```bash
+docker-compose exec backend php artisan test
+```
+
+**Localmente:**
 ```bash
 cd backend
 php artisan test
 ```
 
 ### Frontend
+**Com Docker:**
+```bash
+docker-compose exec frontend npm run test
+```
+
+**Localmente:**
 ```bash
 cd frontend
-# Comandos de teste serão adicionados
+npm run test
 ```
 
 ## 🚀 Deploy
 
-Instruções de deploy serão adicionadas após conclusão do desenvolvimento.
+### Produção com Docker
+
+O projeto está configurado com Dockerfiles otimizados para produção:
+
+```bash
+# Build das imagens de produção
+docker-compose -f docker-compose.yml build
+
+# Deploy em produção
+docker-compose up -d
+```
+
+### Otimizações Implementadas
+- **Multi-stage builds** para reduzir tamanho das imagens
+- **Cache de dependências** para builds mais rápidos
+- **Nginx** otimizado para servir o frontend
+- **MySQL** com configurações de performance
+- **Volumes persistentes** para dados do banco
+
+Consulte `OTIMIZACOES_DOCKER.md` para detalhes técnicos.
 
 ## 📄 Licença
 
@@ -153,6 +263,7 @@ Este projeto é parte de um desafio técnico.
 
 **Status do Projeto:**
 - ✅ Backend: Completo e funcional
-- 🚧 Frontend: Em desenvolvimento
-- 🚧 Integração: Pendente
-- 🚧 Deploy: Pendente
+- ✅ Frontend: Completo e funcional
+- ✅ Integração: Implementada
+- ✅ Docker: Otimizado para desenvolvimento e produção
+- ✅ Deploy: Pronto para produção

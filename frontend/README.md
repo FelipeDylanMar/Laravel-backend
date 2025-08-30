@@ -177,12 +177,34 @@ frontend/
 
 ## ⚙️ Configuração e Instalação
 
-### Pré-requisitos
+### 🐳 Com Docker (Recomendado)
+
+#### Pré-requisitos
+- **Docker Desktop** - Versão mais recente
+- **Docker Compose** - Incluído no Docker Desktop
+
+#### Instalação
+
+```bash
+# Clone o repositório
+git clone <repository-url>
+cd INNYX-Challange
+
+# Inicie o frontend com Docker
+docker-compose up -d frontend
+
+# Acesse a aplicação
+# Frontend: http://localhost:3000
+```
+
+### 🔧 Desenvolvimento Local (Alternativo)
+
+#### Pré-requisitos
 - **Node.js** 20.19.0+ ou 22.12.0+
 - **npm** ou **yarn**
 - **Git**
 
-### Instalação
+#### Instalação
 
 ```bash
 # Clone o repositório
@@ -198,6 +220,25 @@ npm install
 
 ### Scripts Disponíveis
 
+#### 🐳 Com Docker
+```bash
+# Desenvolvimento com hot-reload
+docker-compose up -d frontend
+
+# Build para produção
+docker-compose -f docker-compose.prod.yml up -d frontend
+
+# Executar testes
+docker-compose exec frontend npm run test
+
+# Type checking
+docker-compose exec frontend npm run type-check
+
+# Acessar container para comandos manuais
+docker-compose exec frontend sh
+```
+
+#### 🔧 Desenvolvimento Local
 ```bash
 # Desenvolvimento com hot-reload
 npm run dev
@@ -227,6 +268,22 @@ npm run type-check
 
 ### Executando Testes
 
+#### 🐳 Com Docker
+```bash
+# Executar todos os testes
+docker-compose exec frontend npm run test
+
+# Executar testes em modo watch
+docker-compose exec frontend npm run test -- --watch
+
+# Executar testes com coverage
+docker-compose exec frontend npm run test -- --coverage
+
+# Interface gráfica dos testes
+docker-compose exec frontend npm run test:ui
+```
+
+#### 🔧 Desenvolvimento Local
 ```bash
 # Executar todos os testes
 npm run test
@@ -316,6 +373,10 @@ innyx-neutral-*: /* Escala de cinzas */
 
 ## 🌐 Integração com Backend
 
+### API Base URL
+- **Docker:** `http://localhost:8000/api`
+- **Local:** `http://127.0.0.1:8000/api`
+
 ### API Endpoints
 - **GET** `/api/products` - Listar produtos
 - **POST** `/api/products` - Criar produto
@@ -328,10 +389,21 @@ innyx-neutral-*: /* Escala de cinzas */
 - **Bearer Token** em headers
 - **Token Storage** no localStorage
 - **Automatic Token Injection** em requisições
+- **Cross-Origin** configurado para Docker
 
 ## 🚀 Deploy e Produção
 
-### Build de Produção
+### 🐳 Deploy com Docker (Recomendado)
+
+```bash
+# Build de produção com Docker
+docker-compose -f docker-compose.prod.yml up -d frontend
+
+# Ou usando o script de desenvolvimento
+.\dev-start.ps1
+```
+
+### 🔧 Build Local
 
 ```bash
 # Gerar build otimizada
@@ -342,10 +414,13 @@ npm run preview
 ```
 
 ### Configurações de Deploy
-- **Static Hosting** (Netlify, Vercel)
+- **Docker Container** com Nginx otimizado
+- **Multi-stage Build** para produção
+- **Static Hosting** (Netlify, Vercel) como alternativa
 - **CDN** para assets
 - **Environment Variables** por ambiente
 - **Health Checks** configurados
+- **Nginx Configuration** customizada para SPA
 
 ## 📚 Documentação Adicional
 

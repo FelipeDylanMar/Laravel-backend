@@ -1,61 +1,162 @@
+# 🚀 Backend API - Sistema de Gerenciamento de Produtos
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API backend desenvolvida em Laravel 11 para o sistema de gerenciamento de produtos, containerizada com Docker para desenvolvimento e produção.
 
-## About Laravel
+## ✨ Funcionalidades
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **CRUD completo de produtos** com validações robustas
+- **Sistema de categorias** para organização
+- **Autenticação Laravel Sanctum** com tokens Bearer
+- **Upload de imagens** com validação de tipo e tamanho
+- **Paginação e busca** avançada por nome/descrição
+- **Relacionamentos** entre produtos e categorias
+- **API RESTful** seguindo padrões de mercado
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🐳 Execução com Docker (Recomendado)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Pré-requisitos
+- Docker Desktop
+- Docker Compose
 
-## Learning Laravel
+### Inicialização Rápida
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+# Na raiz do projeto
+docker-compose up -d backend mysql
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# Gerar chave da aplicação (primeira execução)
+docker-compose exec backend php artisan key:generate
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Executar migrações
+docker-compose exec backend php artisan migrate --seed
+```
 
-## Laravel Sponsors
+### Comandos Úteis
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+# Ver logs do backend
+docker-compose logs -f backend
 
-### Premium Partners
+# Executar comandos Artisan
+docker-compose exec backend php artisan migrate
+docker-compose exec backend php artisan test
+docker-compose exec backend php artisan tinker
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Acessar container
+docker-compose exec backend bash
+```
 
-## Contributing
+## 🔧 Execução Local (Alternativo)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Pré-requisitos
+- PHP 8.2+
+- Composer
+- MySQL ou SQLite
 
-## Code of Conduct
+### Instalação
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
 
-## Security Vulnerabilities
+## 🌐 Endpoints da API
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Base URL:** `http://localhost:8000/api`
 
-## License
+### Categorias (Público)
+```http
+GET /api/categories
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Produtos (Autenticado)
+```http
+GET    /api/products           # Listar com paginação/busca
+POST   /api/products           # Criar produto
+GET    /api/products/{id}      # Visualizar produto
+PUT    /api/products/{id}      # Atualizar produto
+DELETE /api/products/{id}      # Excluir produto
+```
+
+### Autenticação
+**Credenciais de teste:**
+- Email: `teste@exemplo.com`
+- Senha: `123456`
+
+**Gerar token:**
+```bash
+docker-compose exec backend php artisan tinker
+# No tinker:
+$user = App\Models\User::where('email', 'teste@exemplo.com')->first();
+$token = $user->createToken('test-token')->plainTextToken;
+echo $token;
+```
+
+## 🗄️ Banco de Dados
+
+### Estrutura
+- **categories** - Categorias de produtos
+- **products** - Produtos com relacionamento
+- **users** - Usuários do sistema
+- **personal_access_tokens** - Tokens Sanctum
+
+### Configuração Docker
+- **Host:** `mysql` (interno) / `localhost` (externo)
+- **Porta:** `3306`
+- **Database:** `innyx_db`
+- **Usuário:** `innyx_user`
+- **Senha:** `innyx_password`
+
+## 🧪 Testes
+
+```bash
+# Com Docker
+docker-compose exec backend php artisan test
+
+# Localmente
+php artisan test
+```
+
+## 📁 Estrutura do Projeto
+
+```
+backend/
+├── app/
+│   ├── Http/Controllers/     # Controllers da API
+│   ├── Models/              # Models Eloquent
+│   └── Providers/           # Service Providers
+├── database/
+│   ├── migrations/          # Migrações do banco
+│   ├── seeders/            # Seeders de dados
+│   └── mysql.cnf           # Configurações MySQL otimizadas
+├── routes/
+│   └── api.php             # Rotas da API
+├── storage/
+│   └── app/public/images/  # Upload de imagens
+├── Dockerfile              # Container otimizado multi-stage
+├── .env.docker            # Configurações para Docker
+└── README_SISTEMA_PRODUTOS.md # Documentação detalhada
+```
+
+## 🚀 Otimizações Docker
+
+- **Multi-stage build** para reduzir tamanho da imagem
+- **Cache de dependências** Composer para builds rápidos
+- **Configurações MySQL** otimizadas para performance
+- **Volumes persistentes** para dados e uploads
+- **Health checks** para monitoramento
+
+## 📚 Documentação Adicional
+
+- **Sistema Completo:** `README_SISTEMA_PRODUTOS.md`
+- **Projeto Geral:** `README_PROJETO.md`
+- **Otimizações Docker:** `../OTIMIZACOES_DOCKER.md`
+
+## 📄 Licença
+
+Este projeto é parte do INNYX Challenge e utiliza o framework Laravel sob licença MIT.

@@ -13,22 +13,30 @@ API backend desenvolvida em Laravel para gerenciamento de produtos com autentica
 - **Paginação e busca** por nome/descrição
 - **Relacionamento** entre produtos e categorias
 
-## Tecnologias Utilizadas
+## 🛠️ Tecnologias Utilizadas
 
 - **Laravel 11** - Framework PHP
 - **Laravel Sanctum** - Autenticação por token
-- **MySQL/SQLite** - Banco de dados
+- **MySQL 8.0** - Banco de dados (Docker)
+- **SQLite** - Banco de dados (desenvolvimento local)
 - **PHP 8.2+** - Linguagem de programação
+- **Docker & Docker Compose** - Containerização
 
-## Requisitos do Sistema
+## 📋 Requisitos do Sistema
 
-### Requisitos Mínimos
+### 🐳 Com Docker (Recomendado)
+- **Docker Desktop** - Versão mais recente
+- **Docker Compose** - Incluído no Docker Desktop
+- **Memória:** Mínimo 2GB RAM
+- **Espaço em disco:** 500MB livres
+
+### 🔧 Desenvolvimento Local
 - **PHP:** 8.2 ou superior
-- **Composer:** 2.0 ou superior
-- **Memória:** 512MB RAM
+- **Composer:** Para gerenciamento de dependências
+- **MySQL:** 8.0+ ou SQLite
+- **Memória:** Mínimo 512MB RAM
 - **Espaço em disco:** 100MB livres
-
-### Extensões PHP Necessárias
+- **Extensões PHP necessárias:**
 - `pdo_sqlite` ou `pdo_mysql`
 - `mbstring`
 - `json`
@@ -52,15 +60,47 @@ API backend desenvolvida em Laravel para gerenciamento de produtos com autentica
 - `categoria_id` (Foreign Key para categories)
 - `created_at`, `updated_at`
 
-## Instalação e Configuração
+## 🚀 Instalação e Configuração
 
-### Pré-requisitos
+### 🐳 Com Docker (Recomendado)
+
+#### Pré-requisitos
+- Docker Desktop
+- Docker Compose
+
+#### Passos de Instalação
+
+1. **Clone o repositório:**
+   ```bash
+   git clone <url-do-repositorio>
+   cd INNYX-Challange
+   ```
+
+2. **Inicie os serviços:**
+   ```bash
+   docker-compose up -d backend mysql
+   ```
+
+3. **Configure a aplicação (primeira execução):**
+   ```bash
+   docker-compose exec backend php artisan key:generate
+   docker-compose exec backend php artisan migrate --seed
+   docker-compose exec backend php artisan storage:link
+   ```
+
+4. **Acesse a aplicação:**
+   - Backend API: http://localhost:8000
+   - MySQL: localhost:3306
+
+### 🔧 Desenvolvimento Local (Alternativo)
+
+#### Pré-requisitos
 - PHP 8.2 ou superior
 - Composer
 - MySQL ou SQLite
 - Extensões PHP: pdo, pdo_mysql (ou pdo_sqlite)
 
-### Passos de Instalação
+#### Passos de Instalação
 
 1. **Clone o repositório e navegue para o backend**
    ```bash
@@ -83,27 +123,28 @@ API backend desenvolvida em Laravel para gerenciamento de produtos com autentica
 
 4. **Configure o banco de dados no arquivo .env**
    ```env
+   # Para SQLite
+   DB_CONNECTION=sqlite
+   DB_DATABASE=/caminho/absoluto/para/database/database.sqlite
+   
+   # Para MySQL
    DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
+   DB_HOST=localhost
    DB_PORT=3306
-   DB_DATABASE=laravel
-   DB_USERNAME=root
-   DB_PASSWORD=
+   DB_DATABASE=innyx_db
+   DB_USERNAME=seu_usuario
+   DB_PASSWORD=sua_senha
    ```
 
 5. **Execute as migrations**
    ```bash
-   php artisan migrate
+   php artisan migrate --seed
    ```
 
 6. **Crie o diretório para imagens**
    ```bash
-   mkdir public/images
-   ```
-
-7. **Popule o banco com dados de exemplo (opcional)**
-   ```bash
-   php artisan db:seed
+   mkdir -p storage/app/public/products
+   php artisan storage:link
    ```
 
 ## Estrutura do Projeto
@@ -126,12 +167,19 @@ INNYX-Challange/
 
 ## Execução
 
-### Iniciar o servidor de desenvolvimento
+### Executando o Servidor de Desenvolvimento
+
+**Com Docker:**
+```bash
+docker-compose up -d backend
+```
+
+**Localmente:**
 ```bash
 php artisan serve
 ```
 
-O servidor estará disponível em: `http://localhost:8000`
+A API estará disponível em: `http://localhost:8000`
 
 ### Para desenvolvimento com frontend
 ```bash
@@ -146,10 +194,9 @@ npm run dev
 
 ## Endpoints da API
 
-### Base URL
-```
-http://localhost:8000/api
-```
+### 🧪 Testando os Endpoints
+
+**Base URL:** `http://localhost:8000/api`
 
 ### Categorias
 
