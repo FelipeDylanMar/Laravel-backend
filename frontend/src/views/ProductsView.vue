@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Header -->
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
           <div class="flex items-center space-x-3 mb-2">
@@ -12,7 +11,7 @@
             Lista de todos os produtos cadastrados no sistema.
           </p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+        <div v-if="canCreateProducts" class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <router-link
             to="/products/new"
             class="btn-primary text-sm"
@@ -23,7 +22,6 @@
         </div>
       </div>
 
-      <!-- Search and Filters -->
       <div class="mt-8">
         <div class="flex flex-col sm:flex-row gap-4">
           <div class="flex-1">
@@ -72,12 +70,10 @@
         </div>
       </div>
 
-      <!-- Loading State -->
       <div v-if="loading" class="mt-8 flex justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
 
-      <!-- Error State -->
       <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
         <div class="flex">
           <div class="flex-shrink-0">
@@ -91,7 +87,6 @@
         </div>
       </div>
 
-      <!-- Products Grid -->
       <div v-else-if="products.length > 0" class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         <template v-for="product in products" :key="product?.id || Math.random()">
           <div
@@ -128,12 +123,14 @@
                   Ver
                 </router-link>
                 <router-link
+                  v-if="canEditProducts"
                   :to="`/products/${product?.id}/edit`"
                   class="text-innyx-secondary-600 hover:text-innyx-secondary-800 text-xs font-medium transition-colors px-2 py-1 bg-innyx-secondary-50 rounded hover:bg-innyx-secondary-100"
                 >
                   Editar
                 </router-link>
                 <button
+                  v-if="canDeleteProducts"
                   @click="deleteProduct(product?.id)"
                   class="text-red-600 hover:text-red-900 text-xs font-medium transition-colors px-2 py-1 bg-red-50 rounded hover:bg-red-100"
                 >
@@ -146,14 +143,13 @@
         </template>
       </div>
 
-      <!-- Empty State -->
       <div v-else class="mt-8 text-center">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
         <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum produto encontrado</h3>
         <p class="mt-1 text-sm text-gray-500">Comece criando um novo produto.</p>
-        <div class="mt-6">
+        <div v-if="canCreateProducts" class="mt-6">
           <router-link
             to="/products/new"
             class="btn-primary text-sm"
@@ -163,7 +159,6 @@
         </div>
       </div>
 
-      <!-- Pagination -->
       <div v-if="totalPages > 1" class="mt-8 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
         <div class="flex flex-1 justify-between sm:hidden">
           <button
@@ -240,6 +235,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
+import { usePermissions } from '@/composables/usePermissions'
 import type { Filters } from '@/types'
 import { SortOrder } from '@/types'
 
@@ -251,6 +247,7 @@ declare global {
 
 const router = useRouter()
 const productsStore = useProductsStore()
+const { canCreateProducts, canEditProducts, canDeleteProducts } = usePermissions()
 
 const searchQuery = ref('')
 const sortBy = ref('name')

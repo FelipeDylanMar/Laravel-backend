@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Breadcrumb -->
       <nav class="flex mb-8" aria-label="Breadcrumb">
         <ol class="flex items-center space-x-4">
           <li>
@@ -37,12 +36,10 @@
         </ol>
       </nav>
 
-      <!-- Loading State -->
       <div v-if="loading" class="flex justify-center py-12">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
 
-      <!-- Error State -->
       <div v-else-if="error" class="rounded-md bg-red-50 p-4">
         <div class="flex">
           <div class="flex-shrink-0">
@@ -56,14 +53,12 @@
         </div>
       </div>
 
-      <!-- Product Detail -->
       <div v-else-if="product" class="card overflow-hidden">
         <div class="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
           <!-- Image Gallery -->
           <div class="flex flex-col-reverse">
 
 
-            <!-- Main image -->
             <div class="w-full">
               <div class="relative h-96 md:h-[500px] lg:h-[600px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl shadow-lg">
                 <img
@@ -75,11 +70,9 @@
                   @load="imageLoaded = true"
                   :class="{ 'opacity-0': !imageLoaded }"
                 />
-                <!-- Loading placeholder -->
                 <div v-if="!imageLoaded && selectedImage && !imageError" class="absolute inset-0 flex items-center justify-center bg-gray-100">
                   <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
                 </div>
-                <!-- No image placeholder -->
                 <div v-if="!selectedImage || imageError" class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col items-center justify-center text-gray-500">
                   <svg class="h-24 w-24 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -91,9 +84,7 @@
             </div>
           </div>
 
-          <!-- Product info -->
           <div class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-            <!-- Header with logo -->
             <div class="flex items-start justify-between mb-6">
               <div class="flex-1">
                 <div class="flex items-center mb-4">
@@ -112,7 +103,6 @@
               </div>
             </div>
 
-            <!-- Category and Validity -->
             <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="bg-gray-50 rounded-lg p-4">
                 <h3 class="text-sm font-medium text-gray-600 uppercase tracking-wide">Categoria</h3>
@@ -139,7 +129,6 @@
               </div>
             </div>
 
-            <!-- Description -->
             <div class="mt-8">
               <h3 class="text-lg font-semibold text-gray-900 mb-4">Descrição do Produto</h3>
               <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -149,7 +138,6 @@
               </div>
             </div>
 
-            <!-- Metadata -->
             <div class="mt-8 border-t border-gray-200 pt-8">
               <h3 class="text-sm font-medium text-gray-900">Informações Adicionais</h3>
               <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -169,9 +157,9 @@
               </div>
             </div>
 
-            <!-- Actions -->
             <div class="mt-10 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               <router-link
+                v-if="canEditProducts"
                 :to="`/products/${product.id}/edit`"
                 class="btn-primary flex-1 text-center inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
               >
@@ -181,6 +169,7 @@
                 Editar Produto
               </router-link>
               <button
+                v-if="canDeleteProducts"
                 @click="deleteProduct"
                 class="btn-secondary flex-1 inline-flex items-center justify-center px-6 py-3 border border-red-300 text-base font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
               >
@@ -191,7 +180,6 @@
               </button>
             </div>
 
-            <!-- Back to products -->
             <div class="mt-6">
               <router-link
                 to="/products"
@@ -215,12 +203,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
 import { useAuthStore } from '@/stores/auth'
+import { usePermissions } from '@/composables/usePermissions'
 
 
 const route = useRoute()
 const router = useRouter()
 const productsStore = useProductsStore()
 const authStore = useAuthStore()
+const { canEditProducts, canDeleteProducts } = usePermissions()
 
 const imageError = ref(false)
 const imageLoaded = ref(false)
