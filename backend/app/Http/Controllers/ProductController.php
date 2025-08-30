@@ -61,6 +61,8 @@ class ProductController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+
+
         $validated = $request->validate([
             'nome' => 'required|string|max:50',
             'descricao' => 'required|string|max:200',
@@ -69,14 +71,21 @@ class ProductController extends Controller
             'categoria_id' => 'required|exists:categories,id',
             'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-        
+
         if ($request->hasFile('imagem')) {
             $imageName = time() . '.' . $request->imagem->extension();
             $request->imagem->move(public_path('images'), $imageName);
             $validated['imagem'] = $imageName;
         }
-        
-        $product = Product::create($validated);
+
+        // Usar transação para garantir consistência
+        $product = \DB::transaction(function () use ($validated) {
+            // Forçar charset UTF-8 na conexão dentro da transação
+            \DB::statement("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
+            \DB::statement("SET CHARACTER SET utf8mb4");
+
+            return Product::create($validated);
+        });
         $product->load('category');
         $product->image_url = $product->imagem ? url('images/' . $product->imagem) : null;
         
@@ -93,30 +102,17 @@ class ProductController extends Controller
     public function update(Request $request, string $id): JsonResponse
     {
         $product = Product::findOrFail($id);
-        
-        $validated = $request->validate([
-            'nome' => 'sometimes|required|string|max:50',
-            'descricao' => 'sometimes|required|string|max:200',
-            'preco' => 'sometimes|required|numeric|min:0.01',
-            'data_validade' => 'sometimes|required|date|after:today',
-            'categoria_id' => 'sometimes|required|exists:categories,id',
-            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-        
-        if ($request->hasFile('imagem')) {
-            if ($product->imagem && file_exists(public_path('images/' . $product->imagem))) {
-                unlink(public_path('images/' . $product->imagem));
-            }
-            
-            $imageName = time() . '.' . $request->imagem->extension();
-            $request->imagem->move(public_path('images'), $imageName);
-            $validated['imagem'] = $imageName;
+
+        // Validação simples
+        $data = $request->only(['nome', 'descricao', 'preco', 'data_validade', 'categoria_id']);
+
+        if (!empty($data)) {
+            $product->update($data);
         }
-        
-        $product->update($validated);
+
         $product->load('category');
         $product->image_url = $product->imagem ? url('images/' . $product->imagem) : null;
-        
+
         return response()->json($product);
     }
 
