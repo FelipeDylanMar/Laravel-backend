@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Category;
+use App\Models\Role;
 
 use Illuminate\Database\Seeder;
 
@@ -11,6 +12,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Primeiro chama o ACLSeeder para criar roles
+        $this->call(ACLSeeder::class);
+        
+        // Depois cria os usuários com roles
+        $adminRole = Role::where('name', 'Admin')->first();
+        
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -20,6 +27,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Usuário Principal',
             'email' => 'teste@exemplo.com',
             'password' => bcrypt('123456'),
+            'role_id' => $adminRole->id,
+            'email_verified_at' => now()
         ]);
         
         Category::create(['nome' => 'Eletrônicos']);
@@ -31,6 +40,5 @@ class DatabaseSeeder extends Seeder
         Category::create(['nome' => 'Outros']);
         
         $this->call(ProductSeeder::class);
-        $this->call(ACLSeeder::class);
     }
 }
