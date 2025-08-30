@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
@@ -18,23 +19,30 @@ class CheckRole
             return $this->unauthorizedResponse('User not authenticated');
         }
 
-        if (!$user->relationLoaded('role')) {
-            $user->load('role');
-        }
+        $cacheKey = "user.{$user->id}.role.check";
+        $userRoleData = Cache::remember($cacheKey, 1800, function () use ($user) {
+            if (!$user->relationLoaded('role')) {
+                $user->load('role');
+            }
+            return [
+                'name' => $user->role?->name,
+                'level' => $user->role?->level ?? 0
+            ];
+        });
 
         $hasRole = false;
 
         switch ($type) {
             case 'any':
                 $roles = explode('|', $role);
-                $hasRole = in_array($user->role?->name, $roles);
+                $hasRole = in_array($userRoleData['name'], $roles);
                 break;
             case 'level':
                 $minLevel = (int) $role;
-                $hasRole = $user->hasRoleLevel($minLevel);
+                $hasRole = $userRoleData['level'] >= $minLevel;
                 break;
             default:
-                $hasRole = $user->hasRole($role);
+                $hasRole = $userRoleData['name'] === $role;
                 break;
         }
 

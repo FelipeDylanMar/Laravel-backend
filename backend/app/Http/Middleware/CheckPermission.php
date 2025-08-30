@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckPermission
@@ -18,23 +19,27 @@ class CheckPermission
             return $this->unauthorizedResponse('User not authenticated');
         }
 
-        if (!$user->relationLoaded('role')) {
-            $user->load('role.permissions');
-        }
+        $cacheKey = "user.{$user->id}.permissions.check";
+        $userPermissions = Cache::remember($cacheKey, 1800, function () use ($user) {
+            if (!$user->relationLoaded('role') || !$user->role?->relationLoaded('permissions')) {
+                $user->load('role.permissions');
+            }
+            return $user->role?->permissions->pluck('name')->toArray() ?? [];
+        });
 
         $hasPermission = false;
 
         switch ($type) {
             case 'any':
                 $permissions = explode('|', $permission);
-                $hasPermission = $user->hasAnyPermission($permissions);
+                $hasPermission = !empty(array_intersect($permissions, $userPermissions));
                 break;
             case 'all':
                 $permissions = explode('|', $permission);
-                $hasPermission = $user->hasAllPermissions($permissions);
+                $hasPermission = empty(array_diff($permissions, $userPermissions));
                 break;
             default:
-                $hasPermission = $user->hasPermission($permission);
+                $hasPermission = in_array($permission, $userPermissions);
                 break;
         }
 

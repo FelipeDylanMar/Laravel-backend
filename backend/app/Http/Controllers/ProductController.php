@@ -4,14 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $perPage = $request->get('per_page', 10);
+        $perPage = min($perPage, 50);
+        
         $query = Product::with('category');
         
 
@@ -41,7 +46,9 @@ class ProductController extends Controller
             $query->orderBy('nome', 'asc');
         }
         
-        $products = $query->paginate(10);
+        $query->orderBy('id', 'asc');
+        
+        $products = $query->paginate($perPage);
         
 
         $products->getCollection()->transform(function ($product) {
@@ -124,5 +131,14 @@ class ProductController extends Controller
         $product->delete();
         
         return response()->json(['message' => 'Produto deletado com sucesso']);
+    }
+
+    public function categories(): JsonResponse
+    {
+        $categories = Cache::remember('categories.all', 3600, function () {
+            return Category::orderBy('nome')->get();
+        });
+        
+        return response()->json($categories);
     }
 }

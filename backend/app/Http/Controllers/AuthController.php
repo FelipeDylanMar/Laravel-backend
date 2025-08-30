@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -16,7 +19,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('role.permissions')->where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -25,8 +28,6 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth-token')->plainTextToken;
-
-        $user->load('role.permissions');
         
         $userData = $user->toArray();
         $userData['role'] = $user->role?->name;
@@ -51,11 +52,21 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        $user = $request->user()->load('role.permissions');
+        $user = $request->user();
         
-        $userData = $user->toArray();
-        $userData['role'] = $user->role?->name;
-        $userData['permissions'] = $user->role?->permissions->pluck('name')->toArray() ?? [];
+        $cacheKey = "user.{$user->id}.permissions";
+        $userData = Cache::remember($cacheKey, 1800, function () use ($user) {
+            if (!$user->relationLoaded('role') || !$user->role?->relationLoaded('permissions')) {
+                $user->load('role.permissions');
+            }
+            
+            $userData = $user->toArray();
+            $userData['role'] = $user->role?->name;
+            $userData['permissions'] = $user->role?->permissions->pluck('name')->toArray() ?? [];
+            $userData['role_level'] = $user->role?->level ?? 0;
+            
+            return $userData;
+        });
         
         return response()->json($userData);
     }
