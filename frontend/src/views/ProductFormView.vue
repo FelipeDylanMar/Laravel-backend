@@ -125,23 +125,23 @@
 
           <!-- Category -->
           <div>
-            <label for="category_id" class="block text-sm font-medium text-gray-700">
+            <label for="categoria_id" class="block text-sm font-medium text-gray-700">
               Categoria *
             </label>
             <div class="mt-1">
               <select
-                id="category_id"
-                v-model="form.category_id"
+                id="categoria_id"
+                v-model="form.categoria_id"
                 required
                 class="input-field"
-                :class="{ 'border-red-300': errors.category_id }"
+                :class="{ 'border-red-300': errors.categoria_id }"
               >
                 <option value="">Selecione uma categoria</option>
                 <option v-for="category in categories" :key="category.id" :value="category.id">
                   {{ category.nome }}
                 </option>
               </select>
-              <p v-if="errors.category_id" class="mt-2 text-sm text-red-600">{{ errors.category_id }}</p>
+              <p v-if="errors.categoria_id" class="mt-2 text-sm text-red-600">{{ errors.categoria_id }}</p>
             </div>
           </div>
 
@@ -275,7 +275,7 @@ const form = reactive<ProductFormData & { image: File | null }>({
   nome: '',
   descricao: '',
   preco: '',
-  category_id: '',
+  categoria_id: '',
   data_validade: '',
   image: null
 })
@@ -284,7 +284,7 @@ const errors = reactive<Record<string, string>>({
   nome: '',
   descricao: '',
   preco: '',
-  category_id: '',
+  categoria_id: '',
   data_validade: '',
   image: ''
 })
@@ -323,14 +323,14 @@ const fetchProduct = async () => {
         nome: productsStore.currentProduct.nome || '',
         descricao: productsStore.currentProduct.descricao || '',
         preco: productsStore.currentProduct.preco || '',
-        category_id: productsStore.currentProduct.category_id || '',
+        categoria_id: productsStore.currentProduct.categoria_id || '',
         data_validade: productsStore.currentProduct.data_validade || '',
         image: null
       })
       if (productsStore.currentProduct.image_url) {
         imagePreview.value = productsStore.currentProduct.image_url
       } else if (productsStore.currentProduct.imagem) {
-        imagePreview.value = `http://127.0.0.1:8000/images/${productsStore.currentProduct.imagem}`
+        imagePreview.value = `http://localhost:8000/images/${productsStore.currentProduct.imagem}`
       }
     }
   } catch (err) {
@@ -365,14 +365,24 @@ const validateForm = () => {
     isValid = false
   }
   
-  if (!form.category_id) {
-    errors.category_id = 'Categoria é obrigatória'
+  if (!form.categoria_id) {
+    errors.categoria_id = 'Categoria é obrigatória'
     isValid = false
   }
   
   if (!form.data_validade) {
     errors.data_validade = 'Data de validade é obrigatória'
     isValid = false
+  } else {
+    const today = new Date()
+    const selectedDate = new Date(form.data_validade)
+    today.setHours(0, 0, 0, 0)
+    selectedDate.setHours(0, 0, 0, 0)
+    
+    if (selectedDate <= today) {
+      errors.data_validade = 'Data de validade deve ser futura'
+      isValid = false
+    }
   }
   
   return isValid
@@ -388,17 +398,26 @@ const handleSubmit = async () => {
   
   try {
     if (isEditing.value) {
-      const productData = {
+      if (form.image) {
+        const formData = new FormData()
+        formData.append('nome', form.nome)
+        formData.append('descricao', form.descricao)
+        formData.append('preco', form.preco.toString())
+        formData.append('data_validade', form.data_validade)
+        formData.append('categoria_id', form.categoria_id.toString())
+        formData.append('imagem', form.image)
+
+        await productsStore.updateProduct(productId.value as string, formData as any)
+      } else {
+        const productData = {
           nome: form.nome,
           descricao: form.descricao,
           preco: parseFloat(form.preco.toString()),
           data_validade: form.data_validade,
-          category_id: parseInt(form.category_id.toString())
+          categoria_id: parseInt(form.categoria_id.toString())
         }
-      
-      await productsStore.updateProduct(productId.value as string, productData)
-      
-      if (form.image) {
+
+        await productsStore.updateProduct(productId.value as string, productData)
       }
     } else {
       const formData = new FormData()
@@ -406,7 +425,7 @@ const handleSubmit = async () => {
       formData.append('descricao', form.descricao)
       formData.append('preco', form.preco.toString())
       formData.append('data_validade', form.data_validade)
-      formData.append('categoria_id', form.category_id.toString())
+      formData.append('categoria_id', form.categoria_id.toString())
       
       if (form.image) {
         formData.append('imagem', form.image)
@@ -417,15 +436,32 @@ const handleSubmit = async () => {
     
     router.push('/products')
   } catch (err: any) {
-    if (err?.response && typeof err.response === 'object') {
-      const backendErrors = err.response as any
+    console.error('Erro ao criar produto:', err)
+    
+    // Verificar se é um erro de resposta HTTP
+    if (err?.response?.data) {
+      const backendErrors = err.response.data
       
       if (backendErrors.errors) {
+        // Mapear erros do backend para os campos do formulário
         Object.keys(backendErrors.errors).forEach(field => {
-          if (field === 'descricao' && backendErrors.errors[field].includes('200')) {
-            errors.descricao = 'Descrição deve ter no máximo 200 caracteres'
-          } else if (errors.hasOwnProperty(field)) {
-            errors[field] = backendErrors.errors[field][0] || backendErrors.errors[field]
+          const errorMessages = backendErrors.errors[field]
+          const errorMessage = Array.isArray(errorMessages) ? errorMessages[0] : errorMessages
+          
+          // Mapear nomes de campos do backend para frontend
+          const fieldMap: Record<string, string> = {
+            'categoria_id': 'categoria_id',
+            'nome': 'nome',
+            'descricao': 'descricao',
+            'preco': 'preco',
+            'data_validade': 'data_validade',
+            'imagem': 'image'
+          }
+          
+          const frontendField = fieldMap[field] || field
+          
+          if (errors.hasOwnProperty(frontendField)) {
+            errors[frontendField] = errorMessage
           }
         })
         submitError.value = 'Por favor, corrija os erros nos campos destacados'

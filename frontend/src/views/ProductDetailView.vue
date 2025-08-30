@@ -227,7 +227,7 @@ const productImages = computed(() => {
   
   if (product.value.imagem) {
     images.push({
-      src: `http://127.0.0.1:8000/images/${product.value.imagem}`,
+      src: `http://localhost:8000/images/${product.value.imagem}`,
       alt: `${product.value.nome} - Imagem principal`
     })
   } else if (product.value.image_url) {

@@ -96,7 +96,7 @@
           <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 rounded-t-lg">
             <img
               v-if="product?.image_url || product?.imagem"
-              :src="product?.image_url || (product?.imagem ? `http://127.0.0.1:8000/images/${product?.imagem}` : '')"
+              :src="product?.image_url || (product?.imagem ? `http://localhost:8000/images/${product?.imagem}` : '')"
               :alt="product?.nome || product?.name || 'Produto'"
               class="h-48 w-full object-cover object-center"
             />
