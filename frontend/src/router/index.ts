@@ -91,11 +91,13 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
   const aclStore = useAclStore()
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-
   if (authStore.token && !authStore.user && requiresAuth) {
-    await authStore.checkAuth()
+    const isValid = await authStore.checkAuth()
+    if (!isValid) {
+      next({ name: 'Login', query: { redirect: to.fullPath } })
+      return
+    }
   }
-
 
   if (requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } })

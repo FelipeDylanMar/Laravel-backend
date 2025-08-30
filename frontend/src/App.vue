@@ -10,7 +10,15 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 onMounted(async () => {
   try {
-    await authStore.checkAuth()
+    if (authStore.token) {
+      const isValid = await authStore.checkAuth()
+      if (!isValid) {
+        console.log('Token inválido detectado na inicialização, estado limpo')
+      }
+    }
+  } catch (error) {
+    console.error('Erro na verificação de autenticação:', error)
+    await authStore.logout()
   } finally {
     isInitializing.value = false
   }

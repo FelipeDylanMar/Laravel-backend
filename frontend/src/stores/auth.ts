@@ -76,6 +76,25 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
   }
 
+  const clearAuthState = (): void => {
+    user.value = null
+    token.value = null
+    localStorage.removeItem('token')
+    aclStore.resetAcl()
+  }
+
+  const validateTokenPeriodically = (): void => {
+    if (token.value && user.value) {
+      checkAuth().catch(() => {
+        console.log('Token expirado detectado, estado limpo automaticamente')
+      })
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    setInterval(validateTokenPeriodically, 5 * 60 * 1000)
+  }
+
   return {
     user,
     token,
@@ -86,6 +105,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     checkAuth,
-    clearError
+    clearError,
+    clearAuthState
   }
 })
