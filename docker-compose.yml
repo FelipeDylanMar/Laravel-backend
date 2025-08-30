@@ -1,0 +1,49 @@
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: innyx-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: innyx_challenge
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Backend Laravel
+  backend:
+    image: php:8.2-cli
+    container_name: innyx-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - mysql
+    command: >
+      bash -c "docker-php-ext-install pdo_mysql &&
+               cp .env.docker .env &&
+               php artisan serve --host=0.0.0.0 --port=8000"
+
+  # Frontend Vue.js
+  frontend:
+    image: node:20
+    container_name: innyx-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    depends_on:
+      - backend
+    command: >
+      sh -c "npm ci &&
+             npm run dev -- --host 0.0.0.0"
+
+volumes:
+  mysql_data:
