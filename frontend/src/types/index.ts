@@ -91,6 +91,8 @@ export interface Product {
   descricao?: string
   /** Product price (Portuguese) - can be string for form inputs */
   preco?: number | string
+  /** Category ID (Portuguese) */
+  categoria_id?: number
   /** Product image (Portuguese) */
   imagem?: string
   /** Expiration date (Portuguese) */
@@ -124,6 +126,8 @@ export interface ProductFormData {
   descricao: string
   /** Product price (Portuguese) - required */
   preco: number | string
+  /** Category ID (Portuguese) - required */
+  categoria_id: number | string
   /** Expiration date (Portuguese) - required */
   data_validade: string
   /** Product stock (Portuguese) */
