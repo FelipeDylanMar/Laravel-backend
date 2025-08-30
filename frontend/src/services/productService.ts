@@ -57,9 +57,14 @@ class ProductService {
 
   async updateProduct(id: number | string, productData: ProductFormData | FormData): Promise<Product> {
     try {
-      const formData = productData instanceof FormData ? productData : this.convertToFormData(productData)
-      const response = await apiService.put<ApiResponse<Product>>(`/products/${id}`, formData)
-      return response.data
+      if (productData instanceof FormData) {
+        productData.append('_method', 'PUT')
+        const response = await apiService.post<Product>(`/products/${id}`, productData)
+        return response
+      } else {
+        const response = await apiService.put<Product>(`/products/${id}`, productData)
+        return response
+      }
     } catch (error) {
       throw new Error(this.extractErrorMessage(error, 'Erro ao atualizar produto'))
     }

@@ -1,7 +1,7 @@
 import type { ErrorResponse, ApiError } from '@/types'
 
 const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
   TIMEOUT: 10000,
   MAX_RETRIES: 3,
   RETRY_DELAY: 1000
@@ -28,9 +28,18 @@ class ApiService {
 
   private createHeaders(customHeaders: Record<string, string> = {}): Record<string, string> {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
       'Accept': 'application/json',
       ...customHeaders
+    }
+
+    // Só adicionar Content-Type se não foi explicitamente removido ou definido como vazio
+    if (!customHeaders.hasOwnProperty('Content-Type') || customHeaders['Content-Type'] !== '') {
+      if (!customHeaders.hasOwnProperty('Content-Type')) {
+        headers['Content-Type'] = 'application/json'
+      }
+    } else {
+      // Se Content-Type foi definido como string vazia, remover completamente
+      delete headers['Content-Type']
     }
 
     const token = this.getAuthToken()
@@ -137,12 +146,13 @@ class ApiService {
   }
 
   async post<T = unknown>(
-    endpoint: string, 
+    endpoint: string,
     data: Record<string, unknown> | FormData = {}
   ): Promise<T> {
     const isFormData = data instanceof FormData
-    const headers = isFormData ? {} : undefined
-    
+    // Para FormData, remover Content-Type para que o browser defina automaticamente com boundary
+    const headers = isFormData ? { 'Content-Type': '' } : undefined
+
     return this.request<T>(endpoint, {
       method: 'POST',
       body: isFormData ? data : JSON.stringify(data),
@@ -151,12 +161,13 @@ class ApiService {
   }
 
   async put<T = unknown>(
-    endpoint: string, 
+    endpoint: string,
     data: Record<string, unknown> | FormData = {}
   ): Promise<T> {
     const isFormData = data instanceof FormData
-    const headers = isFormData ? {} : undefined
-    
+    // Para FormData, remover Content-Type para que o browser defina automaticamente com boundary
+    const headers = isFormData ? { 'Content-Type': '' } : undefined
+
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: isFormData ? data : JSON.stringify(data),

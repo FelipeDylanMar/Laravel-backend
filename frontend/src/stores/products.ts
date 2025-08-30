@@ -117,22 +117,23 @@ export const useProductsStore = defineStore('products', () => {
     }
   }
 
-  const updateProduct = async (id: number | string, productData: ProductFormData): Promise<Product> => {
+  const updateProduct = async (id: number | string, productData: ProductFormData | FormData): Promise<Product> => {
     isLoading.value = true
     error.value = null
-    
+
     try {
       const updatedProduct = await productService.updateProduct(id, productData)
-      
+
       const index = products.value.findIndex(p => p.id == id)
+
       if (index !== -1) {
-        products.value[index] = updatedProduct
+        products.value.splice(index, 1, updatedProduct)
       }
-      
+
       if (currentProduct.value && currentProduct.value.id == id) {
         currentProduct.value = updatedProduct
       }
-      
+
       return updatedProduct
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
@@ -170,6 +171,8 @@ export const useProductsStore = defineStore('products', () => {
     filters.value.search = searchTerm
     return await fetchProducts(1)
   }
+
+
 
   const filterByCategory = async (categoryId: number | null): Promise<PaginatedResponse<Product>> => {
     filters.value.category = categoryId
