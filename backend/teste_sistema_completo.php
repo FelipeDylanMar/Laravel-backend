@@ -95,7 +95,7 @@ try {
             echo "   Para habilitar cURL, descomente 'extension=curl' no php.ini\n";
         } else {
             $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:8000/api/categories');
+        curl_setopt($ch, CURLOPT_URL, 'http://localhost:8000/api/categories');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         $response = curl_exec($ch);
@@ -112,7 +112,7 @@ try {
         
         // Testar endpoint de produtos (protegido)
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:8000/api/products');
+        curl_setopt($ch, CURLOPT_URL, 'http://localhost:8000/api/products');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -142,7 +142,7 @@ try {
         ];
         
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:8000/api/products');
+        curl_setopt($ch, CURLOPT_URL, 'http://localhost:8000/api/products');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -175,7 +175,7 @@ try {
 }
 
 echo "\n=== TESTE CONCLUÍDO ===\n";
-echo "\n🌐 Servidor disponível em: http://127.0.0.1:8000\n";
+echo "\n🌐 Servidor disponível em: http://localhost:8000\n";
 echo "📚 Documentação: README_SISTEMA_PRODUTOS.md\n";
 echo "\n🔑 Para testar as APIs manualmente, use:\n";
 echo "   Email: teste@exemplo.com\n";
