@@ -7,43 +7,87 @@ services:
     environment:
       MYSQL_DATABASE: innyx_challenge
       MYSQL_ROOT_PASSWORD: password
+      MYSQL_INNODB_BUFFER_POOL_SIZE: 256M
+      MYSQL_INNODB_LOG_FILE_SIZE: 64M
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./backend/database/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
 
   # Backend Laravel
   backend:
-    image: php:8.2-cli
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
     container_name: innyx-backend
     restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/var/www/html
-    working_dir: /var/www/html
+      - backend_vendor:/var/www/html/vendor
+      - backend_storage:/var/www/html/storage
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_HOST=mysql
+      - DB_DATABASE=innyx_challenge
+      - DB_USERNAME=root
+      - DB_PASSWORD=password
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
     depends_on:
-      - mysql
-    command: >
-      bash -c "docker-php-ext-install pdo_mysql &&
-               cp .env.docker .env &&
-               php artisan serve --host=0.0.0.0 --port=8000"
+      mysql:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
 
   # Frontend Vue.js
   frontend:
-    image: node:20
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
     container_name: innyx-frontend
     restart: unless-stopped
     ports:
       - "5173:5173"
     volumes:
       - ./frontend:/app
-    working_dir: /app
+      - frontend_node_modules:/app/node_modules
+      - frontend_dist:/app/dist
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
-    command: >
-      sh -c "npm ci &&
-             npm run dev -- --host 0.0.0.0"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
 volumes:
   mysql_data:
+  backend_vendor:
+  backend_storage:
+  frontend_node_modules:
+  frontend_dist:
