@@ -96,12 +96,28 @@ class User extends Authenticatable
     }
 
     /**
-     * Get user permissions through role.
+     * Get user permissions through role with caching.
      */
     public function getPermissions()
     {
-        return $this->role?->permissions ?? collect();
+        if (!$this->role) {
+            return collect();
+        }
+
+        if ($this->role->relationLoaded('permissions')) {
+            return $this->role->permissions;
+        }
+        if (!isset($this->cachedPermissions)) {
+            $this->cachedPermissions = $this->role->permissions;
+        }
+
+        return $this->cachedPermissions;
     }
+
+    /**
+     * Cached permissions for this request.
+     */
+    protected $cachedPermissions;
 
     /**
      * Check if user is admin.
