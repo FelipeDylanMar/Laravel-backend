@@ -104,7 +104,6 @@ class RoleController extends Controller
     {
         $role = Role::findOrFail($id);
         
-        // Check if role has users
         if ($role->users()->count() > 0) {
             return response()->json([
                 'success' => false,

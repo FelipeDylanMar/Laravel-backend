@@ -14,7 +14,7 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 15);
-        $perPage = min($perPage, 100);
+        $perPage = min($perPage, 50);
         
         $query = User::query();
         
@@ -24,11 +24,10 @@ class UserController extends Controller
         
         if ($request->has('search')) {
             $search = $request->get('search');
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
+            $query->where('name', 'like', "%{$search}%");
         }
+        
+        $query->orderBy('id', 'asc');
         
         $users = $query->with('role')->paginate($perPage);
         
