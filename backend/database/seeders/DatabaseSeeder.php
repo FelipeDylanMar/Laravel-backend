@@ -9,26 +9,19 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-
-
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
         
-
         User::create([
             'name' => 'Usuário Principal',
             'email' => 'teste@exemplo.com',
             'password' => bcrypt('123456'),
         ]);
         
-
         Category::create(['nome' => 'Eletrônicos']);
         Category::create(['nome' => 'Roupas']);
         Category::create(['nome' => 'Livros']);
@@ -37,7 +30,7 @@ class DatabaseSeeder extends Seeder
         Category::create(['nome' => 'Brinquedos']);
         Category::create(['nome' => 'Outros']);
         
-
         $this->call(ProductSeeder::class);
+        $this->call(ACLSeeder::class);
     }
 }

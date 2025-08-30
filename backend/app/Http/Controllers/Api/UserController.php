@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -12,24 +11,41 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-   
     public function index(Request $request): JsonResponse
     {
-        $query = User::with('role');
+        $perPage = $request->get('per_page', 15);
+        $perPage = min($perPage, 100);
+        
+        $query = User::query();
         
         if ($request->has('role_id')) {
             $query->where('role_id', $request->role_id);
         }
         
-        $users = $query->get();
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        $users = $query->with('role')->paginate($perPage);
         
         return response()->json([
             'success' => true,
-            'data' => $users
+            'data' => $users->items(),
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'from' => $users->firstItem(),
+                'to' => $users->lastItem()
+            ]
         ]);
     }
 
-   
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -51,7 +67,6 @@ class UserController extends Controller
         ], 201);
     }
 
-    
     public function show(string $id): JsonResponse
     {
         $user = User::with('role')->findOrFail($id);
@@ -62,7 +77,6 @@ class UserController extends Controller
         ]);
     }
 
-    
     public function update(Request $request, string $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -90,7 +104,6 @@ class UserController extends Controller
         ]);
     }
 
-   
     public function destroy(string $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -101,7 +114,6 @@ class UserController extends Controller
             'message' => 'User deleted successfully'
         ]);
     }
-    
     
     public function assignRole(Request $request, string $id): JsonResponse
     {

@@ -9,9 +9,6 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Login do usuário
-     */
     public function login(Request $request)
     {
         $request->validate([
@@ -19,7 +16,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::with('role.permissions')->where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -29,9 +26,12 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
+        $user->load('role.permissions');
+        
         $userData = $user->toArray();
         $userData['role'] = $user->role?->name;
         $userData['permissions'] = $user->role?->permissions->pluck('name')->toArray() ?? [];
+        $userData['role_level'] = $user->role?->level ?? 0;
 
         return response()->json([
             'user' => $userData,
@@ -40,9 +40,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Logout do usuário
-     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -52,9 +49,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Obter dados do usuário autenticado
-     */
     public function user(Request $request)
     {
         $user = $request->user()->load('role.permissions');
@@ -66,9 +60,6 @@ class AuthController extends Controller
         return response()->json($userData);
     }
 
-    /**
-     * Registrar novo usuário
-     */
     public function register(Request $request)
     {
         $request->validate([

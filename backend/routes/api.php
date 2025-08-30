@@ -18,9 +18,14 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
-    Route::apiResource('products', ProductController::class);
     
-    Route::prefix('acl')->group(function () {
+    Route::get('products', [ProductController::class, 'index'])->middleware('permission:products.view');
+    Route::post('products', [ProductController::class, 'store'])->middleware('permission:products.create');
+    Route::get('products/{product}', [ProductController::class, 'show'])->middleware('permission:products.view');
+    Route::put('products/{product}', [ProductController::class, 'update'])->middleware('permission:products.edit');
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->middleware('permission:products.delete');
+    
+    Route::prefix('acl')->middleware('role:Admin')->group(function () {
         Route::apiResource('roles', RoleController::class);
         Route::post('roles/{id}/assign-permissions', [RoleController::class, 'assignPermissions']);
         Route::post('roles/{id}/remove-permissions', [RoleController::class, 'removePermissions']);
