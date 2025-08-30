@@ -73,25 +73,21 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative" id="user-profile-dropdown" v-if="user">
-    <!-- Profile Button -->
+  <div class="relative" id="user-profile-dropdown" v-if="user && authStore.isAuthenticated">
     <button
       @click="toggleDropdown"
       class="flex items-center space-x-3 text-white hover:text-innyx-primary-200 transition-colors focus:outline-none focus:ring-2 focus:ring-innyx-primary-300 rounded-lg p-2"
       :class="{ 'bg-innyx-primary-700': isDropdownOpen }"
     >
-      <!-- Avatar -->
       <div class="w-8 h-8 bg-innyx-primary-300 rounded-full flex items-center justify-center text-innyx-primary-800 font-semibold text-sm">
         {{ userInitials }}
       </div>
       
-      <!-- User Info (hidden on mobile) -->
       <div class="hidden md:block text-left">
         <div class="text-sm font-medium">{{ user.name }}</div>
         <div class="text-xs text-innyx-primary-200">{{ userRole }}</div>
       </div>
       
-      <!-- Dropdown Arrow -->
       <svg 
         class="w-4 h-4 transition-transform duration-200" 
         :class="{ 'rotate-180': isDropdownOpen }"
@@ -103,7 +99,6 @@ onUnmounted(() => {
       </svg>
     </button>
 
-    <!-- Dropdown Menu -->
     <transition
       enter-active-class="transition ease-out duration-200"
       enter-from-class="transform opacity-0 scale-95"
@@ -116,7 +111,6 @@ onUnmounted(() => {
         v-if="isDropdownOpen"
         class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
       >
-        <!-- User Info Header -->
         <div class="px-4 py-3 border-b border-gray-100">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 bg-innyx-primary-500 rounded-full flex items-center justify-center text-white font-semibold">
@@ -130,7 +124,6 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Permissions Info -->
         <div class="px-4 py-2 border-b border-gray-100" v-if="user.permissions && user.permissions.length > 0">
           <div class="text-xs text-gray-500 mb-1">Permissões:</div>
           <div class="flex flex-wrap gap-1">
@@ -152,7 +145,6 @@ onUnmounted(() => {
 
 
 
-        <!-- Logout -->
         <div class="border-t border-gray-100 py-1">
           <button
             @click="logout"
@@ -170,7 +162,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Additional styles for better visual hierarchy */
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;

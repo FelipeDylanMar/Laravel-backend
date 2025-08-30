@@ -111,7 +111,7 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                     </svg>
-                    {{ getCategoryName(product.category_id) }}
+                    {{ product.category?.nome || 'Categoria não definida' }}
                   </span>
                 </div>
               </div>
@@ -300,26 +300,7 @@ const formatDate = (dateString: string | null | undefined) => {
   }).format(new Date(dateString))
 }
 
-const getCategoryName = (categoryId: number | string | null | undefined) => {
-  const categoryMap: Record<number, string> = {
-    1: 'Eletrônicos',
-    2: 'Roupas',
-    3: 'Casa e Jardim',
-    4: 'Esportes',
-    5: 'Livros',
-    6: 'Beleza',
-    7: 'Outros'
-  }
-  
-  if (typeof categoryId === 'number') {
-    return categoryMap[categoryId] || 'Categoria não definida'
-  }
-  if (typeof categoryId === 'string') {
-    const id = parseInt(categoryId)
-    return categoryMap[id] || 'Categoria não definida'
-  }
-  return 'Categoria não definida'
-}
+
 
 
 
