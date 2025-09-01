@@ -69,14 +69,7 @@ class ProductSeeder extends Seeder
                 'data_validade' => now()->addYears(3),
                 'imagem' => 'tenis.jpg',
             ],
-            [
-                'nome' => 'Boneca Barbie',
-                'descricao' => 'Boneca Barbie com roupas e acessórios inclusos.',
-                'preco' => 49.99,
-                'categoria_id' => $categories->where('nome', 'Brinquedos')->first()->id,
-                'data_validade' => now()->addYears(5),
-                'imagem' => 'boneca.jpg',
-            ],
+
             [
                 'nome' => 'Fone de Ouvido Bluetooth',
                 'descricao' => 'Fone de ouvido sem fio com cancelamento de ruído e bateria de longa duração.',
