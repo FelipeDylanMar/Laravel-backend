@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -78,11 +79,9 @@ class ProductController extends Controller
             $validated['imagem'] = $imageName;
         }
 
-        // Usar transação para garantir consistência
-        $product = \DB::transaction(function () use ($validated) {
-            // Forçar charset UTF-8 na conexão dentro da transação
-            \DB::statement("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
-            \DB::statement("SET CHARACTER SET utf8mb4");
+        $product = DB::transaction(function () use ($validated) {
+            DB::statement("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
+            DB::statement("SET CHARACTER SET utf8mb4");
 
             return Product::create($validated);
         });
